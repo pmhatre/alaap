@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Build
+dist/
+build/
+.next/
+out/
+
+# Data (raw scraped/downloaded data - not committed)
+data/raw/
+data/tmp/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
