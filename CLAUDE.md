@@ -12,10 +12,15 @@ Early development — brainstorming and documentation phase (Feb 2026). No code 
 - `docs/research/data-sources.md` — exhaustive data source assessment (Tiers 1-4)
 - `docs/research/data-ingestion-plan.md` — prioritized ingestion plan
 
-## Technical Direction (Emerging)
-- **Graph database** for the knowledge layer — relationships are first-class
-- **Next.js** likely for the frontend (Praneet's primary stack)
-- **Claude personas** for content generation: musicologist, cultural historian, curator
+## Technical Stack
+- **Graph DB**: Neo4j Aura Free — Cypher queries, `neo4j-driver` for TypeScript
+- **Frontend + API**: Next.js 15 (App Router), Server Components, Route Handlers
+- **Styling**: Tailwind CSS + Radix UI
+- **Data pipeline**: Python (scrapers, normalizers, loaders) — lives in `pipeline/`, runs locally
+- **Deployment**: Vercel (free tier) + Neo4j Aura Free — $0/month
+- **NL search (Phase 2)**: Claude Haiku (text-to-Cypher) + Claude Sonnet (response formatting)
+- **Graph viz**: react-force-graph-2d
+- **Architecture doc**: `docs/architecture.md`
 
 ## Domain Context
 - **Raag** (raga) — melodic framework in Indian classical music. Central organizing concept.
