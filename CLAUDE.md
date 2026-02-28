@@ -4,7 +4,7 @@
 A knowledge base and exploratory interface for golden era Indian film music (late 1940s-1970s), with emphasis on classical and semi-classical compositions. Built as a personal project by Praneet Mhatre.
 
 ## Project Status
-Phase 0 (scaffolding), Phase 1A (data seeding), and Phase 1B (core pages) complete. Neo4j is populated with 15.5K songs, 4.5K artists, 5.8K films, 253 ragas, 37 taals from 4 sources. The MVP browsing and search UI is live — features F1 (search), F2 (song detail), F3 (raga detail), F4 (artist profiles), plus film pages and a home page with stats. Ready for Phase 2A (data enrichment).
+Phase 0 (scaffolding), Phase 1A (data seeding), Phase 1B (core pages), and quick wins complete. Post-dedup, Neo4j has ~14.1K songs, ~4.4K artists, ~4.2K films, 253 ragas, 37 taals from 4 sources. The browsing and search UI is live with search autocomplete, sort options, films browse page, YouTube listen links, and clickable composers. Ready for Phase 2A (data enrichment).
 
 ## Key Documentation
 - `docs/vision.md` — project vision, thesis, design principles
@@ -19,8 +19,9 @@ Phase 0 (scaffolding), Phase 1A (data seeding), and Phase 1B (core pages) comple
   - `songs/[slug]/` — song detail page + lyrics toggle
   - `ragas/` — raga listing + `[slug]/` detail page
   - `artists/` — artist listing + `[slug]/` profile with role tabs
-  - `films/[slug]/` — film detail page
-  - `search/` — multi-dimensional search with filters
+  - `films/` — paginated films listing + `[slug]/` detail page
+  - `search/` — search with filters, autocomplete (`search-input.tsx`), and sort options
+  - `api/search/suggest/` — autocomplete API route (song title suggestions with relevance tiering)
 - `lib/` — shared modules
   - `neo4j.ts` — driver singleton, `read()`/`write()` helpers
   - `types.ts` — entity interfaces (Song, Raga, Artist, Film, Taal, etc.)
@@ -32,6 +33,9 @@ Phase 0 (scaffolding), Phase 1A (data seeding), and Phase 1B (core pages) comple
   - `reconcile.py` — merges staging JSONs by canonical_id with source-priority per field
   - `run_pipeline.py` — CLI orchestrator (`--scrape`, `--reconcile`, `--load`, `--all`)
   - `staging/` — intermediate JSON outputs (gitignored)
+- `scripts/` — TypeScript maintenance scripts
+  - `dedup.ts` — orchestrator for dedup (`--execute`, `--films-only`, `--artists-only`, `--songs-only`)
+  - `dedup/` — modular dedup: `films.ts`, `artists.ts`, `songs.ts`, `normalize.ts` (schwa collapse, transliteration flattening), `merge.ts`, `types.ts`
 - `db/` — Neo4j schema constraints and setup instructions
 
 ## Technical Stack
