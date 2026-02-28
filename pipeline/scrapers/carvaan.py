@@ -98,6 +98,7 @@ def _parse_markdown(content: str, artist_name: str) -> list[dict]:
             "youtube_id": youtube_id,
             "lyrics": None,
             "notes": None,
+            "language": "Hindi",
             "sources": ["carvaan"],
         })
 

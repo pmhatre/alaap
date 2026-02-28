@@ -90,6 +90,7 @@ def load_films(tx, films: list[dict]):
             "title": film["title"],
             "slug": slug,
             "year": film.get("year"),
+            "language": film.get("language"),
         })
         tx.run(
             "MERGE (f:Film {slug: $slug}) SET f += $props",
@@ -106,6 +107,7 @@ def load_songs(tx, songs: list[dict]):
             "title": song.get("title"),
             "slug": slug,
             "year": song.get("year"),
+            "language": song.get("language"),
             "youtube_id": song.get("youtube_id"),
             "lyrics": song.get("lyrics"),
             "notes": song.get("notes"),

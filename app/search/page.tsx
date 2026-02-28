@@ -20,6 +20,7 @@ interface Props {
     singer?: string;
     decade?: string;
     taal?: string;
+    language?: string;
     sort?: string;
     page?: string;
   }>;
@@ -38,6 +39,7 @@ export default async function SearchPage({ searchParams }: Props) {
       singer: params.singer,
       decade: params.decade,
       taal: params.taal,
+      language: params.language,
       sort,
       page,
     }),
@@ -52,6 +54,7 @@ export default async function SearchPage({ searchParams }: Props) {
   if (params.singer) paginationParams.singer = params.singer;
   if (params.decade) paginationParams.decade = params.decade;
   if (params.taal) paginationParams.taal = params.taal;
+  if (params.language) paginationParams.language = params.language;
   if (sort && sort !== "year_desc") paginationParams.sort = sort;
 
   return (

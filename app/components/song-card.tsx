@@ -59,6 +59,11 @@ export function SongCard({ song }: SongCardProps) {
             {song.composerName && !song.composerSlug && (
               <span>{song.composerName}</span>
             )}
+            {song.language && song.language !== "Hindi" && (
+              <span className="rounded bg-purple-50 px-1.5 py-0.5 text-xs font-medium text-purple-700">
+                {song.language}
+              </span>
+            )}
           </div>
         </div>
         {song.ragas.length > 0 && (

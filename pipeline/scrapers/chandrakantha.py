@@ -179,6 +179,7 @@ def _parse_song_entry(text: str, raga_name: str) -> dict | None:
         "youtube_id": None,
         "lyrics": None,
         "notes": None,
+        "language": "Hindi",
         "sources": ["chandrakantha"],
     }
 

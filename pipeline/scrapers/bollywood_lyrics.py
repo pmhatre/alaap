@@ -78,6 +78,7 @@ def scrape() -> dict:
             "youtube_id": None,
             "lyrics": lyrics,
             "notes": None,
+            "language": "Hindi",
             "sources": ["bollywood_lyrics"],
         })
 

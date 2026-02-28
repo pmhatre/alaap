@@ -19,6 +19,7 @@ export function SearchFilters({ filterOptions }: SearchFiltersProps) {
   const currentSinger = searchParams.get("singer") ?? "";
   const currentDecade = searchParams.get("decade") ?? "";
   const currentTaal = searchParams.get("taal") ?? "";
+  const currentLanguage = searchParams.get("language") ?? "";
   const currentSort = searchParams.get("sort") ?? "year_desc";
 
   const hasFilters =
@@ -27,7 +28,8 @@ export function SearchFilters({ filterOptions }: SearchFiltersProps) {
     currentComposer ||
     currentSinger ||
     currentDecade ||
-    currentTaal;
+    currentTaal ||
+    currentLanguage;
 
   const updateParams = useCallback(
     (key: string, value: string) => {
@@ -93,6 +95,17 @@ export function SearchFilters({ filterOptions }: SearchFiltersProps) {
             value: d,
           }))}
         />
+        {filterOptions.languages.length > 1 && (
+          <FilterSelect
+            label="Language"
+            value={currentLanguage}
+            onChange={(v) => updateParams("language", v)}
+            options={filterOptions.languages.map((l) => ({
+              label: l,
+              value: l,
+            }))}
+          />
+        )}
         {filterOptions.taals.length > 0 && (
           <FilterSelect
             label="Taal"
@@ -142,6 +155,12 @@ export function SearchFilters({ filterOptions }: SearchFiltersProps) {
             <FilterChip
               label={`${currentDecade}s`}
               onClear={() => updateParams("decade", "")}
+            />
+          )}
+          {currentLanguage && (
+            <FilterChip
+              label={`Language: ${currentLanguage}`}
+              onClear={() => updateParams("language", "")}
             />
           )}
           {currentTaal && (

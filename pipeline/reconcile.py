@@ -122,6 +122,7 @@ def reconcile() -> tuple[dict, list[dict]]:
         composer_candidates = {s: song["composer"] for s, song in source_songs.items()}
         lyricist_candidates = {s: song["lyricist"] for s, song in source_songs.items()}
         raga_candidates = {s: song["ragas"] for s, song in source_songs.items()}
+        language_candidates = {s: song.get("language") for s, song in source_songs.items()}
 
         # Merge per field
         title = _pick_best("title", title_candidates)
@@ -131,6 +132,7 @@ def reconcile() -> tuple[dict, list[dict]]:
         composer = _pick_best("composer", composer_candidates)
         lyricist = _pick_best("lyricist", lyricist_candidates)
         ragas, raga_conflict = _merge_ragas(raga_candidates)
+        language = _pick_best("language", language_candidates)
 
         # Source-specific fields
         taal = None
@@ -169,6 +171,7 @@ def reconcile() -> tuple[dict, list[dict]]:
             "youtube_id": youtube_id,
             "lyrics": lyrics,
             "notes": notes,
+            "language": language,
             "sources": all_sources,
         })
 
@@ -215,7 +218,7 @@ def reconcile() -> tuple[dict, list[dict]]:
         if film:
             film_key = f"{film}|{year or 'unknown'}"
             if film_key not in films_seen:
-                films_seen[film_key] = {"title": film, "year": year}
+                films_seen[film_key] = {"title": film, "year": year, "language": song.get("language")}
 
         # Ragas
         for raga in song.get("ragas", []):

@@ -6,6 +6,7 @@ export interface Song {
   titleDevanagari?: string;
   slug: string;
   year?: number;
+  language?: string;
   lyrics?: string;
   lyricsTranslation?: string;
   youtube_id?: string;

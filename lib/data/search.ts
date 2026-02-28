@@ -12,6 +12,7 @@ export interface SearchParams {
   singer?: string;
   decade?: string;
   taal?: string;
+  language?: string;
   sort?: SortOption;
   page?: number;
 }
@@ -22,6 +23,7 @@ export interface FilterOptions {
   singers: { name: string; slug: string }[];
   decades: string[];
   taals: { name: string }[];
+  languages: string[];
 }
 
 export async function searchSongs(
@@ -61,6 +63,11 @@ export async function searchSongs(
   if (params.taal) {
     matchClauses.push("MATCH (s)-[:SET_TO_TAAL]->(filterTaal:Taal {name: $taalName})");
     queryParams.taalName = params.taal;
+  }
+
+  if (params.language) {
+    conditions.push("s.language = $language");
+    queryParams.language = params.language;
   }
 
   if (params.decade) {
@@ -163,7 +170,7 @@ function mapSearchResult(row: Record<string, unknown>): SongListItem {
 }
 
 export async function getFilterOptions(): Promise<FilterOptions> {
-  const [ragaRows, composerRows, singerRows, decadeRows, taalRows] =
+  const [ragaRows, composerRows, singerRows, decadeRows, taalRows, languageRows] =
     await Promise.all([
       read<Record<string, unknown>>(
         `MATCH (r:Raga)<-[:BASED_ON_RAGA]-(s:Song)
@@ -200,6 +207,13 @@ export async function getFilterOptions(): Promise<FilterOptions> {
          RETURN t.name AS name
          ORDER BY cnt DESC`,
       ),
+      read<Record<string, unknown>>(
+        `MATCH (s:Song)
+         WHERE s.language IS NOT NULL
+         WITH s.language AS language, count(s) AS cnt
+         RETURN language
+         ORDER BY cnt DESC`,
+      ),
     ]);
 
   return {
@@ -217,6 +231,7 @@ export async function getFilterOptions(): Promise<FilterOptions> {
     })),
     decades: decadeRows.map((r) => r.decade as string).filter(Boolean),
     taals: taalRows.map((r) => ({ name: r.name as string })),
+    languages: languageRows.map((r) => r.language as string).filter(Boolean),
   };
 }
 

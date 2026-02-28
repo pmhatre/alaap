@@ -3,7 +3,7 @@
 Source: https://en.wikipedia.org/wiki/List_of_film_songs_based_on_ragas
 Structure: single large wikitable with columns: Rāg, Song, Film, Music composer, Singer(s), Lang.
 Column detection is header-text-based (not positional).
-We filter to Hindi-language songs (Lang column blank or 'Hindi').
+Captures language from the Lang column (defaults to Hindi if blank).
 """
 
 import json
@@ -129,7 +129,6 @@ def scrape() -> dict:
 
     all_songs = []
     ragas_seen = {}
-    skipped_lang = 0
 
     for row in rows[1:]:
         cells = row.find_all(["td", "th"])
@@ -142,11 +141,9 @@ def scrape() -> dict:
             if field:
                 record[field] = _clean_wiki_text(cell.get_text(strip=True))
 
-        # Filter to Hindi songs (blank lang = Hindi, or explicitly "Hindi")
-        lang = record.get("lang", "").strip().lower()
-        if lang and lang != "hindi":
-            skipped_lang += 1
-            continue
+        # Capture language (blank lang = Hindi)
+        lang_raw = record.get("lang", "").strip()
+        language = lang_raw.title() if lang_raw else "Hindi"
 
         title_raw = record.get("title", "").strip()
         if not title_raw:
@@ -196,6 +193,7 @@ def scrape() -> dict:
             "youtube_id": None,
             "lyrics": None,
             "notes": notes,
+            "language": language,
             "sources": ["wikipedia"],
         })
 
@@ -209,7 +207,11 @@ def scrape() -> dict:
                     "sources": ["wikipedia"],
                 }
 
-    logger.info(f"Parsed {len(all_songs)} Hindi songs, skipped {skipped_lang} non-Hindi songs")
+    # Count by language
+    lang_counts = {}
+    for s in all_songs:
+        lang_counts[s["language"]] = lang_counts.get(s["language"], 0) + 1
+    logger.info(f"Parsed {len(all_songs)} songs ({lang_counts})")
     logger.info(f"Found {len(ragas_seen)} unique ragas")
 
     result = {

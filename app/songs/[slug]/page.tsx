@@ -77,6 +77,11 @@ export default async function SongPage({ params }: Props) {
             <span className="text-sm">{song.taal.name}</span>
           </MetadataRow>
         )}
+        {song.language && song.language !== "Hindi" && (
+          <MetadataRow label="Language">
+            <span className="text-sm">{song.language}</span>
+          </MetadataRow>
+        )}
       </div>
 
       {/* Ragas */}
