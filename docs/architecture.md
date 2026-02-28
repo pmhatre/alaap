@@ -4,7 +4,7 @@
 
 **Why Neo4j**: Best learning ecosystem (courses, docs, community), most mature TypeScript driver, generous free tier. Cypher is the most expressive graph query language for the traversal-heavy queries Alaap needs — raga recommendations, composer DNA overlap, related songs.
 
-**Free tier**: 200K nodes, 400K relationships. More than enough for the golden era catalog (est. 5-10K songs, ~200 ragas, ~50 composers, ~100 singers, ~3K films).
+**Free tier**: 200K nodes, 400K relationships. Current usage: 15.5K songs, 253 ragas, 4.5K artists, 5.8K films, 37 taals — well within limits.
 
 **Alternatives considered and rejected**:
 - **Memgraph** — faster but weaker TS ecosystem, smaller community
@@ -61,41 +61,41 @@
 
 ### Frontend + API: Next.js 15 (App Router)
 
-- **Server Components** for data-heavy pages (song detail, raga detail, artist profile)
-- **Route Handlers** for API endpoints (not GraphQL — unnecessary complexity for a solo project)
+- **Server Components** for data-heavy pages (song detail, raga detail, artist profile) — fetch directly from Neo4j, no API routes needed
+- **Client Components** only for interactivity (search filters, lyrics toggle, YouTube embed)
 - **Tailwind CSS** for styling
 - **Radix UI** for accessible primitives (dialogs, dropdowns, tabs)
-- **react-force-graph-2d** for graph visualization (F10)
-- **lite-youtube-embed** for performant YouTube embeds
+- **react-force-graph-2d** for graph visualization (F10, planned)
+- **YouTube embeds** via custom facade pattern (thumbnail → iframe on click)
 
 ### Route Structure
 
 ```
 app/
-  page.tsx                    # Home — featured songs, recent additions
+  # Implemented (Phase 1B)
+  page.tsx                    # Home — stats, featured ragas, browse cards
   songs/[slug]/page.tsx       # F2: Song detail
+  ragas/page.tsx              # Raga listing (paginated)
   ragas/[slug]/page.tsx       # F3: Raga detail
-  artists/[slug]/page.tsx     # F4: Artist profile
+  artists/page.tsx            # Artist listing (paginated)
+  artists/[slug]/page.tsx     # F4: Artist profile with role tabs
   films/[slug]/page.tsx       # Film detail
-  search/page.tsx             # F1: Multi-dimensional search
+  search/page.tsx             # F1: Multi-dimensional search with filters
+  components/                 # Shared UI: header, song-card, pagination, entity-link, etc.
+
+  # Planned (Phase 2+)
   explore/page.tsx            # F10: Graph visualization
   ask/page.tsx                # F6: Natural language search
   journeys/page.tsx           # F9: Guided pathways list
   journeys/[slug]/page.tsx    # F9: Individual journey
   favorites/page.tsx          # F8: Praneet's personal canon
-  api/
-    songs/route.ts
-    ragas/route.ts
-    artists/route.ts
-    search/route.ts
-    ask/route.ts              # Text-to-Cypher endpoint
 ```
 
 ### Database Access
 
 - `neo4j-driver` (official JS driver) in a shared `lib/neo4j.ts` module
 - Connection pooling via driver instance (singleton pattern)
-- Cypher queries co-located with route handlers, not abstracted into an ORM
+- Cypher queries in typed functions under `lib/data/` (songs, ragas, artists, films, search, home), imported by Server Components
 
 ### Natural Language Search (F6 — Phase 2)
 
@@ -125,7 +125,7 @@ pipeline/
     ragas.py                 # Raga name variants → canonical name
   loaders/                   # Load into Neo4j
     neo4j_loader.py          # Cypher MERGE queries, idempotent
-  staging/                   # Intermediate canonical JSON (git-tracked)
+  staging/                   # Intermediate canonical JSON (gitignored)
   reconcile.py               # Cross-source conflict detection
   requirements.txt
 ```
@@ -157,31 +157,33 @@ pipeline/
 
 **Total**: $0-10/month. No infrastructure to manage.
 
-**Free tier ceiling**: Aura Free allows 200K nodes and 400K relationships. The golden era core (5-10K songs) fits comfortably. If HindiGeetMala's full 40-60K catalog is ingested later (each song producing ~6-8 relationships), the ceiling gets tight. Options at that point: Aura Pro ($65/mo), self-hosted Neo4j Community, or scope the catalog more tightly to the golden era.
+**Free tier ceiling**: Aura Free allows 200K nodes and 400K relationships. Current usage (~26K nodes) fits comfortably. If HindiGeetMala's full 40-60K catalog is ingested later (each song producing ~6-8 relationships), the ceiling gets tight. Options at that point: Aura Pro ($65/mo), self-hosted Neo4j Community, or scope the catalog more tightly to the golden era.
 
 ---
 
 ## Development Phases
 
-### Phase 0: Scaffolding
+### Phase 0: Scaffolding ✓
 - Initialize Next.js 15 project with App Router, Tailwind, TypeScript
 - Set up Neo4j Aura Free instance
 - Create `lib/neo4j.ts` connection module
 - Create `pipeline/` directory with Python project structure
 - Write Cypher schema constraints (unique slugs, indexes)
 
-### Phase 1A: Seed Data
+### Phase 1A: Seed Data ✓
 - Run Phase 1 scrapers (Wikipedia, Chandrakantha, Carvaan spreadsheet, Bollywood lyrics CSV)
 - Load into Neo4j via idempotent MERGE queries
-- Verify with Neo4j Browser queries
+- Result: 15.5K songs, 4.5K artists, 5.8K films, 253 ragas, 37 taals
 
-### Phase 1B: Core Pages (MVP — F1 through F4)
-- Search page with multi-dimensional filters
-- Song detail page
-- Raga detail page
-- Artist profile page
-- Film page
-- Home page with featured content
+### Phase 1B: Core Pages (MVP — F1 through F4) ✓
+- Search page with multi-dimensional filters (query, raga, composer, singer, decade, taal)
+- Song detail page with metadata grid, raga cards, YouTube embed, collapsible lyrics
+- Raga listing + detail page with properties and paginated song list
+- Artist listing + profile page with signature ragas, collaborators, role tabs
+- Film detail page with song list
+- Home page with stats bar, featured ragas, browse cards
+- Shared components: header, song-card, pagination, entity-link, empty-state, youtube-embed
+- Data query layer: `lib/data/` with typed Cypher functions for all entities
 
 ### Phase 2A: Enrich Data
 - Run Phase 2 scrapers (Raga Junglism, Raag Hindustani) for raga properties

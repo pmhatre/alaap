@@ -4,7 +4,7 @@
 A knowledge base and exploratory interface for golden era Indian film music (late 1940s-1970s), with emphasis on classical and semi-classical compositions. Built as a personal project by Praneet Mhatre.
 
 ## Project Status
-Phase 0 (scaffolding) and Phase 1A (data seeding) complete. Neo4j is populated with 15.5K songs, 4.5K artists, 5.8K films, 253 ragas, 37 taals from 4 sources. Ready for Phase 1B (core pages).
+Phase 0 (scaffolding), Phase 1A (data seeding), and Phase 1B (core pages) complete. Neo4j is populated with 15.5K songs, 4.5K artists, 5.8K films, 253 ragas, 37 taals from 4 sources. The MVP browsing and search UI is live — features F1 (search), F2 (song detail), F3 (raga detail), F4 (artist profiles), plus film pages and a home page with stats. Ready for Phase 2A (data enrichment).
 
 ## Key Documentation
 - `docs/vision.md` — project vision, thesis, design principles
@@ -14,8 +14,17 @@ Phase 0 (scaffolding) and Phase 1A (data seeding) complete. Neo4j is populated w
 - `docs/architecture.md` — technical architecture, entity model, development phases
 
 ## Project Structure
-- `app/` — Next.js 15 App Router (pages, layouts)
-- `lib/` — shared modules (`neo4j.ts` driver singleton, `types.ts` entity interfaces)
+- `app/` — Next.js 15 App Router
+  - `components/` — shared UI: `header`, `song-card`, `pagination`, `entity-link`, `empty-state`, `youtube-embed`
+  - `songs/[slug]/` — song detail page + lyrics toggle
+  - `ragas/` — raga listing + `[slug]/` detail page
+  - `artists/` — artist listing + `[slug]/` profile with role tabs
+  - `films/[slug]/` — film detail page
+  - `search/` — multi-dimensional search with filters
+- `lib/` — shared modules
+  - `neo4j.ts` — driver singleton, `read()`/`write()` helpers
+  - `types.ts` — entity interfaces (Song, Raga, Artist, Film, Taal, etc.)
+  - `data/` — typed Cypher query functions: `songs.ts`, `ragas.ts`, `artists.ts`, `films.ts`, `search.ts`, `home.ts`, `utils.ts`
 - `pipeline/` — Python data pipeline
   - `normalizers/` — curated dictionaries for artist names (~50), ragas (80+), song canonical IDs
   - `scrapers/` — 4 source scrapers: `bollywood_lyrics`, `carvaan`, `chandrakantha`, `wikipedia`
