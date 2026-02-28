@@ -21,11 +21,11 @@
 
 | Node | Key Properties |
 |------|---------------|
-| **Song** | title, titleDevanagari, slug, year, lyrics, lyricsTranslation, youtubeId, spotifyId, mood, notes |
-| **Raga** | name, nameDevanagari, slug, aroha, avaroha, vadi, samvadi, timeOfDay, rasa, pakad, description |
-| **Thaat** | name, nameDevanagari, spiccato (swar pattern) |
-| **Artist** | name, nameDevanagari, slug, bio, birthYear, deathYear, imageUrl |
-| **Film** | title, titleDevanagari, slug, year, language |
+| **Song** | title, titleDevanagari, slug, year, lyrics, lyricsTranslation, youtubeId, spotifyId, mood[] (array), notes, sources[] |
+| **Raga** | name, nameDevanagari, slug, aroha, avaroha, vadi, samvadi, timeOfDay, rasa, pakad, description, sources[] |
+| **Thaat** | name, nameDevanagari, swaras (swar pattern) |
+| **Artist** | name, nameDevanagari, slug, bio, birthYear, deathYear, imageUrl, sources[] |
+| **Film** | title, titleDevanagari, slug, year, language, sources[] |
 | **Taal** | name, nameDevanagari, beats, vibhaag, description |
 | **Alankar** | name, nameDevanagari, description, audioExample |
 | **Journey** | title, slug, description, difficulty, author |
@@ -33,11 +33,11 @@
 ### Relationships
 
 ```
-(Song)-[:BASED_ON_RAGA]->(Raga)
+(Song)-[:BASED_ON_RAGA {primary, section}]->(Raga)  // multi-raga songs: primary flag + section label
 (Song)-[:COMPOSED_BY]->(Artist)
 (Song)-[:SUNG_BY]->(Artist)
 (Song)-[:LYRICS_BY]->(Artist)
-(Song)-[:FROM_FILM]->(Film)
+(Song)-[:FROM_FILM]->(Film)             // optional — non-filmi songs won't have this
 (Song)-[:SET_TO_TAAL]->(Taal)
 (Song)-[:FEATURES_ALANKAR {timestamp, description}]->(Alankar)
 (Raga)-[:BELONGS_TO_THAAT]->(Thaat)
@@ -47,7 +47,13 @@
 (Artist)-[:COLLABORATED_WITH {count}]->(Artist)  // derived
 ```
 
-**Key design decision**: Artist is a single node type. Roles (composer, singer, lyricist) live on the relationships, not the node. This handles multi-role artists naturally — Hemant Kumar composed AND sang, Kishore Kumar acted AND sang.
+**Key design decisions**:
+
+- **Single Artist node type** — roles (composer, singer, lyricist) live on the relationships, not the node. This handles multi-role artists naturally — Hemant Kumar composed AND sang, Kishore Kumar acted AND sang.
+- **`sources[]` array on major nodes** — tracks which data sources contributed to each entity (e.g., `["wikipedia", "chandrakantha", "hindigeetmala"]`). Critical for reconciliation when sources conflict.
+- **`mood[]` as array property** — songs often carry multiple moods (romantic + melancholic). Array properties are natively supported in Neo4j. Can be promoted to a `Mood` node later if mood-based traversals become important.
+- **`FROM_FILM` is optional** — non-filmi songs (ghazals, devotional, independent) exist without a film relationship.
+- **`BASED_ON_RAGA` supports multi-raga songs** — songs that shift ragas or use raga-mala style get multiple edges, with `primary` (boolean) and `section` (string, e.g., "mukhda", "antara") as relationship properties.
 
 ---
 
@@ -119,11 +125,20 @@ pipeline/
     ragas.py                 # Raga name variants → canonical name
   loaders/                   # Load into Neo4j
     neo4j_loader.py          # Cypher MERGE queries, idempotent
+  staging/                   # Intermediate canonical JSON (git-tracked)
   reconcile.py               # Cross-source conflict detection
   requirements.txt
 ```
 
-**Canonical song identifier**: `normalize(title) + normalize(film_title) + year`. Handles the cross-referencing problem across 15+ sources.
+**Staging layer**: Scrapers write normalized JSON to `pipeline/staging/` before loading into Neo4j. Benefits:
+- Data is versionable in git — diff between pipeline runs
+- Debug and inspect without querying Neo4j
+- Decouples scraping from loading — re-run loader without re-scraping
+- Enables dry-run validation before loading
+
+**Canonical song identifier**: `normalize(title) + normalize(film_title) + year`. Handles the cross-referencing problem across 15+ sources. Edge cases:
+- **Non-filmi songs** (ghazals, devotional, independent) — film component is omitted; identity falls back to `normalize(title) + normalize(primary_singer) + year`
+- **Title collisions** within the same film+year (rare) — disambiguate by adding primary singer to the key
 
 **Pipeline phases align with data ingestion plan** (see `docs/research/data-ingestion-plan.md`):
 - Phase 1 scrapers → seed knowledge base (Wikipedia, Chandrakantha, Carvaan, Bollywood Lyrics)
@@ -141,6 +156,8 @@ pipeline/
 | Domain (optional) | Namecheap / Cloudflare | ~$10/yr |
 
 **Total**: $0-10/month. No infrastructure to manage.
+
+**Free tier ceiling**: Aura Free allows 200K nodes and 400K relationships. The golden era core (5-10K songs) fits comfortably. If HindiGeetMala's full 40-60K catalog is ingested later (each song producing ~6-8 relationships), the ceiling gets tight. Options at that point: Aura Pro ($65/mo), self-hosted Neo4j Community, or scope the catalog more tightly to the golden era.
 
 ---
 
