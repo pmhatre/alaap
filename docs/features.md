@@ -122,6 +122,26 @@ Could be a simple force-directed graph or something more designed.
 
 ## Parking Lot
 
+### Language Tagging
+
+Song nodes currently have no `language` property. South Indian songs (Tamil, Telugu, Kannada, Malayalam) show up alongside Hindi songs on raga pages and in search results with no way to distinguish or filter. Needs:
+
+- Add `language` property to Song nodes (likely infer from film metadata or source)
+- Language filter in search UI
+- Visual indicator on song cards (badge or subtitle)
+- Option to scope raga/artist pages by language
+
+### Relevance-Based Search Sorting
+
+Search results currently sort by `year DESC` only — no relevance ranking. When searching by text query, songs with exact title matches or more complete metadata should rank higher. Consider:
+
+- Text match quality (exact > starts-with > contains)
+- Metadata richness (songs with raga, lyrics, notes, youtube_id score higher)
+- Source count (multi-source songs are more canonical)
+- Optionally: raga page song lists sorted by Hindi-first once language tagging exists
+
+### Other Ideas
+
 - Community contributions (allow others to submit raga identifications, annotations)
 - Audio analysis integration (computational raga identification for untagged songs via compIAM)
 - Multilingual support (Hindi/Urdu/English toggle)
