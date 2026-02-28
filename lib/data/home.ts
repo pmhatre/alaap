@@ -74,6 +74,7 @@ export async function getRecentlyAddedSongs(
     `MATCH (s:Song)
      WHERE s.sources IS NOT NULL
      OPTIONAL MATCH (s)-[:FROM_FILM]->(f:Film)
+     WITH s, head(collect(f)) AS f
      OPTIONAL MATCH (s)-[:COMPOSED_BY]->(c:Artist)
      WITH s, f, head(collect(c.name)) AS composerName
      RETURN s.title AS title, s.slug AS slug, s.year AS year,
