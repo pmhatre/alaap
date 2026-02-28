@@ -4,7 +4,7 @@
 A knowledge base and exploratory interface for golden era Indian film music (late 1940s-1970s), with emphasis on classical and semi-classical compositions. Built as a personal project by Praneet Mhatre.
 
 ## Project Status
-Phase 0 (scaffolding), Phase 1A (data seeding), Phase 1B (core pages), and quick wins complete. Post-dedup, Neo4j has ~14.1K songs, ~4.4K artists, ~4.2K films, 253 ragas, 37 taals from 4 sources. The browsing and search UI is live with search autocomplete, sort options, films browse page, YouTube listen links, and clickable composers. Ready for Phase 2A (data enrichment).
+Phase 0 (scaffolding), Phase 1A (data seeding), Phase 1B (core pages), and quick wins complete. Post-dedup, Neo4j has ~14.5K songs, ~4.5K artists, ~4.4K films, 278 ragas, 37 taals from 4 sources. Songs and films now have language tags; Wikipedia scraper includes non-Hindi songs (~230 Telugu, Kannada, Tamil, Malayalam, Bengali, Marathi). The browsing and search UI is live with search autocomplete, sort options, language filter, films browse page, YouTube listen links, and clickable composers. Ready for Phase 2A (data enrichment).
 
 ## Key Documentation
 - `docs/vision.md` — project vision, thesis, design principles
