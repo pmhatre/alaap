@@ -4,13 +4,20 @@
 A knowledge base and exploratory interface for golden era Indian film music (late 1940s-1970s), with emphasis on classical and semi-classical compositions. Built as a personal project by Praneet Mhatre.
 
 ## Project Status
-Early development — brainstorming and documentation phase (Feb 2026). No code yet.
+Phase 0 (scaffolding) complete. Next.js 15 app and Python pipeline are set up. Ready for Phase 1A (data seeding) and Phase 1B (core pages).
 
 ## Key Documentation
 - `docs/vision.md` — project vision, thesis, design principles
 - `docs/features.md` — feature roadmap (Phases 1-3 + parking lot)
 - `docs/research/data-sources.md` — exhaustive data source assessment (Tiers 1-4)
 - `docs/research/data-ingestion-plan.md` — prioritized ingestion plan
+- `docs/architecture.md` — technical architecture, entity model, development phases
+
+## Project Structure
+- `app/` — Next.js 15 App Router (pages, layouts)
+- `lib/` — shared modules (`neo4j.ts` driver singleton, `types.ts` entity interfaces)
+- `pipeline/` — Python data pipeline (scrapers, normalizers, loaders, staging)
+- `db/` — Neo4j schema constraints and setup instructions
 
 ## Technical Stack
 - **Graph DB**: Neo4j Aura Free — Cypher queries, `neo4j-driver` for TypeScript
