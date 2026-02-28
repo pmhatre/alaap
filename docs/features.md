@@ -1,8 +1,8 @@
 # Feature Roadmap
 
-## Phase 1: Foundation (MVP)
+## Phase 1: Foundation (MVP) ✓
 
-### F1. Multi-dimensional Search
+### F1. Multi-dimensional Search ✓
 
 Core feature. Search the knowledge base across several dimensions:
 
@@ -12,22 +12,24 @@ Core feature. Search the knowledge base across several dimensions:
 - **By Singer** — browse by playback singer
 - **By Film** — all songs from a specific film soundtrack
 - **By Era/Decade** — temporal browsing
+- **Autocomplete** — type-ahead song suggestions with relevance tiering (exact → starts-with → word-boundary → contains), 250ms debounce, keyboard navigation
+- **Sort options** — newest first (default), oldest first, title A-Z, relevance (when text query active)
 
 Each result returns the song with its full graph of relationships (raga, composer, singer, lyricist, film, year, taal, mood).
 
-### F2. Song Detail View
+### F2. Song Detail View ✓
 
 Rich page per song showing:
 
 - Core metadata (title, film, year, composer, lyricist, singer(s))
 - Raga information (name, thaat, aroha/avaroha, vadi/samvadi, time of day, mood/rasa)
 - Taal information (if available)
-- Audio link (YouTube/Spotify embed or link)
+- YouTube embed (lazy-loaded, click-to-play)
 - Contextual annotation (what makes this composition notable, recording context)
 - Lyrics (transliteration + Devanagari + English translation where available)
 - Related songs (same raga, same composer, similar mood)
 
-### F3. Raag Detail View
+### F3. Raag Detail View ✓
 
 Rich page per raga showing:
 
@@ -36,7 +38,7 @@ Rich page per raga showing:
 - Audio sample of the raga in its pure classical form
 - Brief educational explanation (accessible to non-trained listeners)
 
-### F4. Composer / Singer / Lyricist Profiles
+### F4. Composer / Singer / Lyricist Profiles ✓
 
 Pages for key artists with:
 
@@ -44,6 +46,16 @@ Pages for key artists with:
 - Complete catalog within the knowledge base
 - Signature ragas (which ragas they used most)
 - Notable collaborations
+
+### Quick Wins (post-Phase 1) ✓
+
+Shipped alongside Phase 1:
+
+- **YouTube listen links** — song cards link directly to YouTube (play icon)
+- **Clickable composers** — composer names on song cards are EntityLinks to artist profiles
+- **Films browse page** — paginated grid at `/films`, ordered by song count, green hover styling
+- **Artist dedup** — script to find/merge duplicate artist nodes from transliteration variants (60 groups, 63 merged)
+- **Improved dedup normalizer** — Hindi schwa collapse and "(film)" suffix stripping; caught 78 additional film dupes and 307 total song dupes across runs
 
 ---
 
@@ -131,14 +143,9 @@ Song nodes currently have no `language` property. South Indian songs (Tamil, Tel
 - Visual indicator on song cards (badge or subtitle)
 - Option to scope raga/artist pages by language
 
-### Relevance-Based Search Sorting
+### ~~Relevance-Based Search Sorting~~ ✓ Shipped
 
-Search results currently sort by `year DESC` only — no relevance ranking. When searching by text query, songs with exact title matches or more complete metadata should rank higher. Consider:
-
-- Text match quality (exact > starts-with > contains)
-- Metadata richness (songs with raga, lyrics, notes, youtube_id score higher)
-- Source count (multi-source songs are more canonical)
-- Optionally: raga page song lists sorted by Hindi-first once language tagging exists
+Implemented as a sort option in search. Relevance scoring: exact match > starts-with > contains. Pre-sorted before relationship expansion in Cypher. Future improvements: metadata richness weighting, source count boosting, Hindi-first sorting on raga pages once language tagging exists.
 
 ### Other Ideas
 
