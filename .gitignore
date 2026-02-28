@@ -21,10 +21,12 @@ dist/
 build/
 .next/
 out/
+tsconfig.tsbuildinfo
 
 # Data (raw scraped/downloaded data - not committed)
 data/raw/
 data/tmp/
+pipeline/staging/*.json
 
 # Python
 __pycache__/
