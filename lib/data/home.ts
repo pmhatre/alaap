@@ -75,9 +75,10 @@ export async function getRecentlyAddedSongs(
      WHERE s.sources IS NOT NULL
      OPTIONAL MATCH (s)-[:FROM_FILM]->(f:Film)
      OPTIONAL MATCH (s)-[:COMPOSED_BY]->(c:Artist)
+     WITH s, f, head(collect(c.name)) AS composerName
      RETURN s.title AS title, s.slug AS slug, s.year AS year,
             f.title AS filmTitle, f.slug AS filmSlug,
-            c.name AS composerName
+            composerName
      ORDER BY size(s.sources) DESC, s.year DESC
      LIMIT $limit`,
     { limit: neo4jInt(limit) },

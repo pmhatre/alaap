@@ -35,7 +35,7 @@ export async function getAllRagas(
       `MATCH (r:Raga)
        OPTIONAL MATCH (s:Song)-[:BASED_ON_RAGA]->(r)
        RETURN properties(r) AS raga, count(s) AS songCount
-       ORDER BY songCount DESC, r.name ASC
+       ORDER BY songCount DESC, raga.name ASC
        SKIP $skip LIMIT $limit`,
       { skip: neo4jInt(skip), limit: neo4jInt(PAGE_SIZE) },
     ),

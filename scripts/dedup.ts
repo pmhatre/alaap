@@ -1,0 +1,131 @@
+/**
+ * Neo4j Song & Film Dedup Script
+ *
+ * Finds and merges duplicate Song and Film nodes caused by transliteration
+ * variants in canonical ID normalization.
+ *
+ * Usage:
+ *   npx tsx --env-file=.env.local scripts/dedup.ts              # dry-run (default)
+ *   npx tsx --env-file=.env.local scripts/dedup.ts --execute     # apply merges
+ *   npx tsx --env-file=.env.local scripts/dedup.ts --films-only  # films only
+ *   npx tsx --env-file=.env.local scripts/dedup.ts --songs-only  # songs only
+ */
+
+import { closeDriver } from "../lib/neo4j";
+import { findFilmDuplicates, buildFilmMergeMap } from "./dedup/films";
+import { findSongDuplicates } from "./dedup/songs";
+import { executeFilmMerge, executeSongMerge } from "./dedup/merge";
+import type { DedupReport, MergeGroup } from "./dedup/types";
+
+const args = process.argv.slice(2);
+const execute = args.includes("--execute");
+const filmsOnly = args.includes("--films-only");
+const songsOnly = args.includes("--songs-only");
+
+function printReport(report: DedupReport) {
+  console.log(`\n${"=".repeat(60)}`);
+  console.log(`${report.entityType} Dedup Report`);
+  console.log(`${"=".repeat(60)}`);
+  console.log(`Total ${report.entityType} nodes: ${report.totalNodes}`);
+  console.log(`Duplicate groups found: ${report.groups.length}`);
+  console.log(`Total duplicates to merge: ${report.totalDuplicates}`);
+
+  if (report.groups.length === 0) {
+    console.log("No duplicates found.");
+    return;
+  }
+
+  console.log(`\nTop groups (up to 20):`);
+  const show = report.groups.slice(0, 20);
+  for (const group of show) {
+    printGroup(group);
+  }
+  if (report.groups.length > 20) {
+    console.log(`  ... and ${report.groups.length - 20} more groups`);
+  }
+}
+
+function printGroup(group: MergeGroup) {
+  const winnerYear = group.winner.year ? ` (${group.winner.year})` : "";
+  const winnerSources = group.winner.sources?.join(", ") ?? "?";
+  console.log(`\n  Key: "${group.key}"`);
+  console.log(
+    `  Winner: ${group.winner.slug}${winnerYear} [${winnerSources}]`,
+  );
+  for (const loser of group.losers) {
+    const loserYear = loser.year ? ` (${loser.year})` : "";
+    const loserSources = loser.sources?.join(", ") ?? "?";
+    console.log(`  Loser:  ${loser.slug}${loserYear} [${loserSources}]`);
+  }
+}
+
+async function main() {
+  console.log(`Mode: ${execute ? "EXECUTE" : "DRY RUN"}`);
+  if (!execute) {
+    console.log("(pass --execute to apply merges)");
+  }
+
+  let filmReport: DedupReport | null = null;
+  let filmMergeMap: Map<string, string> | undefined;
+
+  // Films first (songs reference films)
+  if (!songsOnly) {
+    console.log("\nFinding film duplicates...");
+    filmReport = await findFilmDuplicates();
+    printReport(filmReport);
+    filmMergeMap = buildFilmMergeMap(filmReport);
+
+    if (execute && filmReport.groups.length > 0) {
+      console.log(`\nExecuting ${filmReport.groups.length} film merges...`);
+      for (let i = 0; i < filmReport.groups.length; i++) {
+        await executeFilmMerge(filmReport.groups[i]);
+        if ((i + 1) % 10 === 0) {
+          console.log(`  ... ${i + 1}/${filmReport.groups.length} done`);
+        }
+      }
+      console.log(`Film merges complete.`);
+    }
+  }
+
+  // Songs
+  if (!filmsOnly) {
+    console.log("\nFinding song duplicates...");
+    const songReport = await findSongDuplicates(filmMergeMap);
+    printReport(songReport);
+
+    if (execute && songReport.groups.length > 0) {
+      console.log(`\nExecuting ${songReport.groups.length} song merges...`);
+      for (let i = 0; i < songReport.groups.length; i++) {
+        await executeSongMerge(songReport.groups[i]);
+        if ((i + 1) % 50 === 0) {
+          console.log(`  ... ${i + 1}/${songReport.groups.length} done`);
+        }
+      }
+      console.log(`Song merges complete.`);
+    }
+  }
+
+  // Summary
+  console.log(`\n${"=".repeat(60)}`);
+  console.log("Summary");
+  console.log(`${"=".repeat(60)}`);
+  if (filmReport) {
+    console.log(
+      `Films: ${filmReport.totalDuplicates} duplicates in ${filmReport.groups.length} groups`,
+    );
+  }
+  if (!filmsOnly) {
+    console.log("(song report printed above)");
+  }
+  if (!execute && (filmReport?.groups.length || !filmsOnly)) {
+    console.log("\nRe-run with --execute to apply merges.");
+  }
+
+  await closeDriver();
+}
+
+main().catch(async (err) => {
+  console.error("Fatal error:", err);
+  await closeDriver();
+  process.exit(1);
+});
