@@ -40,6 +40,42 @@ export async function executeFilmMerge(group: MergeGroup): Promise<void> {
 }
 
 /**
+ * Execute an artist merge group: transfer relationships, merge properties, delete losers.
+ */
+export async function executeArtistMerge(group: MergeGroup): Promise<void> {
+  const winnerSlug = group.winner.slug;
+
+  for (const loser of group.losers) {
+    // Transfer incoming relationships from songs (Song→Artist direction)
+    const relTypes = ["SUNG_BY", "COMPOSED_BY", "LYRICS_BY"];
+
+    for (const relType of relTypes) {
+      await write(
+        `MATCH (s:Song)-[r:${relType}]->(loser:Artist {slug: $loserSlug})
+         MATCH (winner:Artist {slug: $winnerSlug})
+         WHERE NOT (s)-[:${relType}]->(winner)
+         CREATE (s)-[:${relType}]->(winner)`,
+        { loserSlug: loser.slug, winnerSlug },
+      );
+    }
+
+    // Merge sources onto winner
+    const mergedSources = unionSources(group.winner.sources, loser.sources);
+    await write(
+      `MATCH (a:Artist {slug: $slug})
+       SET a.sources = $sources`,
+      { slug: winnerSlug, sources: mergedSources },
+    );
+
+    // Delete loser
+    await write(
+      `MATCH (a:Artist {slug: $slug}) DETACH DELETE a`,
+      { slug: loser.slug },
+    );
+  }
+}
+
+/**
  * Execute a song merge group: transfer all relationships, merge properties, delete losers.
  */
 export async function executeSongMerge(group: MergeGroup): Promise<void> {

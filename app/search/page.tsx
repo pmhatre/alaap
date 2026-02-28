@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { searchSongs, getFilterOptions } from "@/lib/data/search";
+import { searchSongs, getFilterOptions, type SortOption } from "@/lib/data/search";
 import { SongCard } from "@/app/components/song-card";
 import { Pagination } from "@/app/components/pagination";
 import { EmptyState } from "@/app/components/empty-state";
@@ -10,6 +10,8 @@ export const metadata: Metadata = {
   title: "Search — Alaap",
 };
 
+const VALID_SORTS = new Set(["year_desc", "year_asc", "title_asc", "relevance"]);
+
 interface Props {
   searchParams: Promise<{
     query?: string;
@@ -18,6 +20,7 @@ interface Props {
     singer?: string;
     decade?: string;
     taal?: string;
+    sort?: string;
     page?: string;
   }>;
 }
@@ -25,6 +28,7 @@ interface Props {
 export default async function SearchPage({ searchParams }: Props) {
   const params = await searchParams;
   const page = Math.max(1, parseInt(params.page ?? "1") || 1);
+  const sort = (VALID_SORTS.has(params.sort ?? "") ? params.sort : "year_desc") as SortOption;
 
   const [{ songs, total }, filterOptions] = await Promise.all([
     searchSongs({
@@ -34,6 +38,7 @@ export default async function SearchPage({ searchParams }: Props) {
       singer: params.singer,
       decade: params.decade,
       taal: params.taal,
+      sort,
       page,
     }),
     getFilterOptions(),
@@ -47,6 +52,7 @@ export default async function SearchPage({ searchParams }: Props) {
   if (params.singer) paginationParams.singer = params.singer;
   if (params.decade) paginationParams.decade = params.decade;
   if (params.taal) paginationParams.taal = params.taal;
+  if (sort && sort !== "year_desc") paginationParams.sort = sort;
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">

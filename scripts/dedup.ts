@@ -5,21 +5,24 @@
  * variants in canonical ID normalization.
  *
  * Usage:
- *   npx tsx --env-file=.env.local scripts/dedup.ts              # dry-run (default)
- *   npx tsx --env-file=.env.local scripts/dedup.ts --execute     # apply merges
- *   npx tsx --env-file=.env.local scripts/dedup.ts --films-only  # films only
- *   npx tsx --env-file=.env.local scripts/dedup.ts --songs-only  # songs only
+ *   npx tsx --env-file=.env.local scripts/dedup.ts                # dry-run (default)
+ *   npx tsx --env-file=.env.local scripts/dedup.ts --execute       # apply merges
+ *   npx tsx --env-file=.env.local scripts/dedup.ts --films-only    # films only
+ *   npx tsx --env-file=.env.local scripts/dedup.ts --artists-only  # artists only
+ *   npx tsx --env-file=.env.local scripts/dedup.ts --songs-only    # songs only
  */
 
 import { closeDriver } from "../lib/neo4j";
 import { findFilmDuplicates, buildFilmMergeMap } from "./dedup/films";
+import { findArtistDuplicates } from "./dedup/artists";
 import { findSongDuplicates } from "./dedup/songs";
-import { executeFilmMerge, executeSongMerge } from "./dedup/merge";
+import { executeFilmMerge, executeArtistMerge, executeSongMerge } from "./dedup/merge";
 import type { DedupReport, MergeGroup } from "./dedup/types";
 
 const args = process.argv.slice(2);
 const execute = args.includes("--execute");
 const filmsOnly = args.includes("--films-only");
+const artistsOnly = args.includes("--artists-only");
 const songsOnly = args.includes("--songs-only");
 
 function printReport(report: DedupReport) {
@@ -65,11 +68,16 @@ async function main() {
     console.log("(pass --execute to apply merges)");
   }
 
+  const runFilms = !songsOnly && !artistsOnly;
+  const runArtists = !filmsOnly && !songsOnly;
+  const runSongs = !filmsOnly && !artistsOnly;
+
   let filmReport: DedupReport | null = null;
+  let artistReport: DedupReport | null = null;
   let filmMergeMap: Map<string, string> | undefined;
 
   // Films first (songs reference films)
-  if (!songsOnly) {
+  if (runFilms) {
     console.log("\nFinding film duplicates...");
     filmReport = await findFilmDuplicates();
     printReport(filmReport);
@@ -87,8 +95,26 @@ async function main() {
     }
   }
 
+  // Artists (between films and songs)
+  if (runArtists) {
+    console.log("\nFinding artist duplicates...");
+    artistReport = await findArtistDuplicates();
+    printReport(artistReport);
+
+    if (execute && artistReport.groups.length > 0) {
+      console.log(`\nExecuting ${artistReport.groups.length} artist merges...`);
+      for (let i = 0; i < artistReport.groups.length; i++) {
+        await executeArtistMerge(artistReport.groups[i]);
+        if ((i + 1) % 10 === 0) {
+          console.log(`  ... ${i + 1}/${artistReport.groups.length} done`);
+        }
+      }
+      console.log(`Artist merges complete.`);
+    }
+  }
+
   // Songs
-  if (!filmsOnly) {
+  if (runSongs) {
     console.log("\nFinding song duplicates...");
     const songReport = await findSongDuplicates(filmMergeMap);
     printReport(songReport);
@@ -114,10 +140,15 @@ async function main() {
       `Films: ${filmReport.totalDuplicates} duplicates in ${filmReport.groups.length} groups`,
     );
   }
-  if (!filmsOnly) {
+  if (artistReport) {
+    console.log(
+      `Artists: ${artistReport.totalDuplicates} duplicates in ${artistReport.groups.length} groups`,
+    );
+  }
+  if (runSongs) {
     console.log("(song report printed above)");
   }
-  if (!execute && (filmReport?.groups.length || !filmsOnly)) {
+  if (!execute) {
     console.log("\nRe-run with --execute to apply merges.");
   }
 

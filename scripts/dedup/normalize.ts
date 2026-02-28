@@ -46,11 +46,40 @@ export function normalizeSpaceless(text: string): string {
 }
 
 /**
+ * Collapse Hindi schwa: remove single 'a' between two consonants.
+ * Handles transliteration variants like "bawara"/"bawra", "sahara"/"sahra".
+ * Applied after doubled-vowel collapsing so 'aa' is already reduced to 'a'.
+ */
+export function collapseSchwa(text: string): string {
+  const consonants = "[bcdfghjklmnpqrstvwxyz]";
+  // Repeatedly collapse interior schwas (one pass may reveal new patterns)
+  let s = text;
+  let prev = "";
+  while (s !== prev) {
+    prev = s;
+    s = s.replace(new RegExp(`(${consonants})a(${consonants})`, "g"), "$1$2");
+  }
+  return s;
+}
+
+/**
  * Build a dedup key for a film: spaceless normalized title (year excluded).
- * Spaceless handles sources that concatenate words (Bollywood Lyrics: "Mughaleazam").
+ * Strips disambiguation suffixes like "(film)" and collapses Hindi schwa
+ * for aggressive matching across transliteration variants.
  */
 export function filmDedupKey(title: string): string {
-  return normalizeSpaceless(title);
+  // Strip common Wikipedia disambiguation suffixes before normalizing
+  let cleaned = title.replace(/\s*\(film\)\s*/gi, " ");
+  let key = normalizeSpaceless(cleaned);
+  return collapseSchwa(key);
+}
+
+/**
+ * Build a dedup key for an artist: normalized name.
+ * Keeps spaces (unlike films) since artist names are short and spaces matter.
+ */
+export function artistDedupKey(name: string): string {
+  return normalizeForDedup(name);
 }
 
 /**
@@ -59,9 +88,9 @@ export function filmDedupKey(title: string): string {
  * Song title keeps spaces to avoid false positives on short titles.
  */
 export function songDedupKey(title: string, filmTitle?: string): string {
-  const normTitle = normalizeForDedup(title);
+  const normTitle = collapseSchwa(normalizeForDedup(title));
   if (filmTitle) {
-    return `${normTitle}|${normalizeSpaceless(filmTitle)}`;
+    return `${normTitle}|${filmDedupKey(filmTitle)}`;
   }
   return normTitle;
 }

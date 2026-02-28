@@ -17,10 +17,18 @@ export function SongCard({ song }: SongCardProps) {
           >
             {song.title}
           </Link>
-          {song.youtubeId && (
-            <span className="ml-1.5 inline-block text-red-500" title="YouTube available">
-              &#9654;
-            </span>
+          {song.youtube_id && (
+            <a
+              href={`https://www.youtube.com/watch?v=${song.youtube_id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ml-1.5 inline-block text-red-500 hover:text-red-600"
+              title="Listen on YouTube"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" className="inline h-4 w-4">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </a>
           )}
           <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-neutral-500">
             {song.filmTitle && song.filmSlug && (
@@ -41,7 +49,16 @@ export function SongCard({ song }: SongCardProps) {
                   .join(", ")}
               </span>
             )}
-            {song.composerName && <span>{song.composerName}</span>}
+            {song.composerName && song.composerSlug && (
+              <EntityLink
+                type="artist"
+                slug={song.composerSlug}
+                name={song.composerName}
+              />
+            )}
+            {song.composerName && !song.composerSlug && (
+              <span>{song.composerName}</span>
+            )}
           </div>
         </div>
         {song.ragas.length > 0 && (

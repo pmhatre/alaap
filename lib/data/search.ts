@@ -3,6 +3,8 @@ import type { SongListItem } from "./songs";
 import type { Song, Raga, Artist } from "@/lib/types";
 import { toPlainObject, toNumber, PAGE_SIZE } from "./utils";
 
+export type SortOption = "year_desc" | "year_asc" | "title_asc" | "relevance";
+
 export interface SearchParams {
   query?: string;
   raga?: string;
@@ -10,6 +12,7 @@ export interface SearchParams {
   singer?: string;
   decade?: string;
   taal?: string;
+  sort?: SortOption;
   page?: number;
 }
 
@@ -73,9 +76,40 @@ export async function searchSongs(
   const baseQuery = `${matchClauses.join("\n")}
     ${whereClause}`;
 
-  const [songsResult, countResult] = await Promise.all([
-    read<Record<string, unknown>>(
-      `${baseQuery}
+  const sort = params.sort ?? "year_desc";
+  const useRelevance = sort === "relevance" && !!params.query;
+
+  let orderClause: string;
+  if (sort === "year_asc") {
+    orderClause = "ORDER BY s.year ASC";
+  } else if (sort === "title_asc") {
+    orderClause = "ORDER BY s.title ASC";
+  } else {
+    orderClause = "ORDER BY s.year DESC";
+  }
+
+  // For relevance sort: compute score, sort, and paginate BEFORE relationship expansion.
+  // For other sorts: sort and paginate after expansion (standard pattern).
+  const relevanceSortQuery = `${baseQuery}
+       WITH s, CASE
+           WHEN toLower(s.title) = toLower($query) THEN 0
+           WHEN toLower(s.title) STARTS WITH toLower($query) THEN 1
+           ELSE 2
+         END AS relevanceScore
+       ORDER BY relevanceScore ASC, s.title ASC
+       SKIP $skip LIMIT $limit
+       WITH s
+       OPTIONAL MATCH (s)-[:BASED_ON_RAGA]->(r:Raga)
+       OPTIONAL MATCH (s)-[:SUNG_BY]->(singer:Artist)
+       OPTIONAL MATCH (s)-[:COMPOSED_BY]->(composer:Artist)
+       OPTIONAL MATCH (s)-[:FROM_FILM]->(f:Film)
+       RETURN properties(s) AS s,
+              collect(DISTINCT {name: r.name, slug: r.slug}) AS ragas,
+              collect(DISTINCT {name: singer.name, slug: singer.slug}) AS singers,
+              {name: composer.name, slug: composer.slug} AS composer,
+              {title: f.title, slug: f.slug} AS film`;
+
+  const standardSortQuery = `${baseQuery}
        WITH s
        OPTIONAL MATCH (s)-[:BASED_ON_RAGA]->(r:Raga)
        OPTIONAL MATCH (s)-[:SUNG_BY]->(singer:Artist)
@@ -86,8 +120,12 @@ export async function searchSongs(
               collect(DISTINCT {name: singer.name, slug: singer.slug}) AS singers,
               {name: composer.name, slug: composer.slug} AS composer,
               {title: f.title, slug: f.slug} AS film
-       ORDER BY s.year DESC
-       SKIP $skip LIMIT $limit`,
+       ${orderClause}
+       SKIP $skip LIMIT $limit`;
+
+  const [songsResult, countResult] = await Promise.all([
+    read<Record<string, unknown>>(
+      useRelevance ? relevanceSortQuery : standardSortQuery,
       queryParams,
     ),
     read<Record<string, unknown>>(
@@ -180,6 +218,45 @@ export async function getFilterOptions(): Promise<FilterOptions> {
     decades: decadeRows.map((r) => r.decade as string).filter(Boolean),
     taals: taalRows.map((r) => ({ name: r.name as string })),
   };
+}
+
+export interface Suggestion {
+  title: string;
+  slug: string;
+  year?: number;
+  filmTitle?: string;
+}
+
+export async function getSuggestions(
+  query: string,
+  limit: number = 8,
+): Promise<Suggestion[]> {
+  if (!query || query.length < 2) return [];
+
+  const rows = await read<Record<string, unknown>>(
+    `MATCH (s:Song)
+     WHERE toLower(s.title) CONTAINS toLower($query)
+     OPTIONAL MATCH (s)-[:FROM_FILM]->(f:Film)
+     WITH s, f,
+       CASE
+         WHEN toLower(s.title) = toLower($query) THEN 0
+         WHEN toLower(s.title) STARTS WITH toLower($query) THEN 1
+         WHEN toLower(s.title) CONTAINS (' ' + toLower($query)) THEN 2
+         ELSE 3
+       END AS tier
+     RETURN s.title AS title, s.slug AS slug, s.year AS year,
+            f.title AS filmTitle, tier
+     ORDER BY tier ASC, s.title ASC
+     LIMIT $limit`,
+    { query, limit: neo4jInt(limit) },
+  );
+
+  return rows.map((r) => ({
+    title: r.title as string,
+    slug: r.slug as string,
+    year: toNumber(r.year),
+    filmTitle: r.filmTitle as string | undefined,
+  }));
 }
 
 function neo4jInt(n: number) {

@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
 import type { FilterOptions } from "@/lib/data/search";
+import { SearchInput } from "./search-input";
 
 interface SearchFiltersProps {
   filterOptions: FilterOptions;
@@ -18,6 +19,7 @@ export function SearchFilters({ filterOptions }: SearchFiltersProps) {
   const currentSinger = searchParams.get("singer") ?? "";
   const currentDecade = searchParams.get("decade") ?? "";
   const currentTaal = searchParams.get("taal") ?? "";
+  const currentSort = searchParams.get("sort") ?? "year_desc";
 
   const hasFilters =
     currentQuery ||
@@ -47,20 +49,11 @@ export function SearchFilters({ filterOptions }: SearchFiltersProps) {
 
   return (
     <div className="space-y-4">
-      {/* Search bar */}
-      <div>
-        <input
-          type="text"
-          placeholder="Search by song title..."
-          defaultValue={currentQuery}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              updateParams("query", (e.target as HTMLInputElement).value);
-            }
-          }}
-          className="w-full rounded-lg border border-neutral-200 px-4 py-2.5 text-sm placeholder:text-neutral-400 focus:border-neutral-400 focus:outline-none"
-        />
-      </div>
+      {/* Search bar with autocomplete */}
+      <SearchInput
+        defaultValue={currentQuery}
+        onSubmit={(q) => updateParams("query", q)}
+      />
 
       {/* Filter row */}
       <div className="flex flex-wrap gap-3">
@@ -111,6 +104,11 @@ export function SearchFilters({ filterOptions }: SearchFiltersProps) {
             }))}
           />
         )}
+        <SortSelect
+          value={currentSort}
+          onChange={(v) => updateParams("sort", v)}
+          hasQuery={!!currentQuery}
+        />
       </div>
 
       {/* Active filters */}
@@ -187,6 +185,29 @@ function FilterSelect({
           {o.label}
         </option>
       ))}
+    </select>
+  );
+}
+
+function SortSelect({
+  value,
+  onChange,
+  hasQuery,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  hasQuery: boolean;
+}) {
+  return (
+    <select
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className="ml-auto rounded-lg border border-neutral-200 px-3 py-1.5 text-sm text-neutral-700 focus:border-neutral-400 focus:outline-none"
+    >
+      <option value="year_desc">Newest first</option>
+      <option value="year_asc">Oldest first</option>
+      <option value="title_asc">Title A-Z</option>
+      {hasQuery && <option value="relevance">Relevance</option>}
     </select>
   );
 }

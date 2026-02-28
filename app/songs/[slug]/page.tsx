@@ -102,9 +102,9 @@ export default async function SongPage({ params }: Props) {
       )}
 
       {/* YouTube */}
-      {song.youtubeId && (
+      {song.youtube_id && (
         <div className="mt-6">
-          <YouTubeEmbed youtubeId={song.youtubeId} title={song.title} />
+          <YouTubeEmbed youtubeId={song.youtube_id} title={song.title} />
         </div>
       )}
 

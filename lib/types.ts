@@ -8,7 +8,7 @@ export interface Song {
   year?: number;
   lyrics?: string;
   lyricsTranslation?: string;
-  youtubeId?: string;
+  youtube_id?: string;
   spotifyId?: string;
   mood?: string[];
   notes?: string;

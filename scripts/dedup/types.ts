@@ -18,7 +18,7 @@ export interface MergeGroup {
 }
 
 export interface DedupReport {
-  entityType: "Film" | "Song";
+  entityType: "Film" | "Song" | "Artist";
   totalNodes: number;
   groups: MergeGroup[];
   totalDuplicates: number;
