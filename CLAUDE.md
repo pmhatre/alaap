@@ -4,7 +4,7 @@
 A knowledge base and exploratory interface for golden era Indian film music (late 1940s-1970s), with emphasis on classical and semi-classical compositions. Built as a personal project by Praneet Mhatre.
 
 ## Project Status
-Phase 0 (scaffolding) complete. Next.js 15 app and Python pipeline are set up. Ready for Phase 1A (data seeding) and Phase 1B (core pages).
+Phase 0 (scaffolding) and Phase 1A (data seeding) complete. Neo4j is populated with 15.5K songs, 4.5K artists, 5.8K films, 253 ragas, 37 taals from 4 sources. Ready for Phase 1B (core pages).
 
 ## Key Documentation
 - `docs/vision.md` — project vision, thesis, design principles
@@ -16,14 +16,20 @@ Phase 0 (scaffolding) complete. Next.js 15 app and Python pipeline are set up. R
 ## Project Structure
 - `app/` — Next.js 15 App Router (pages, layouts)
 - `lib/` — shared modules (`neo4j.ts` driver singleton, `types.ts` entity interfaces)
-- `pipeline/` — Python data pipeline (scrapers, normalizers, loaders, staging)
+- `pipeline/` — Python data pipeline
+  - `normalizers/` — curated dictionaries for artist names (~50), ragas (80+), song canonical IDs
+  - `scrapers/` — 4 source scrapers: `bollywood_lyrics`, `carvaan`, `chandrakantha`, `wikipedia`
+  - `loaders/neo4j_loader.py` — MERGE-based loader, batched, no APOC dependency
+  - `reconcile.py` — merges staging JSONs by canonical_id with source-priority per field
+  - `run_pipeline.py` — CLI orchestrator (`--scrape`, `--reconcile`, `--load`, `--all`)
+  - `staging/` — intermediate JSON outputs (gitignored)
 - `db/` — Neo4j schema constraints and setup instructions
 
 ## Technical Stack
 - **Graph DB**: Neo4j Aura Free — Cypher queries, `neo4j-driver` for TypeScript
 - **Frontend + API**: Next.js 15 (App Router), Server Components, Route Handlers
 - **Styling**: Tailwind CSS + Radix UI
-- **Data pipeline**: Python (scrapers, normalizers, loaders) — lives in `pipeline/`, runs locally
+- **Data pipeline**: Python (scrapers, normalizers, loaders) — lives in `pipeline/`, runs locally via `uv run python run_pipeline.py`
 - **Deployment**: Vercel (free tier) + Neo4j Aura Free — $0/month
 - **NL search (Phase 2)**: Claude Haiku (text-to-Cypher) + Claude Sonnet (response formatting)
 - **Graph viz**: react-force-graph-2d
