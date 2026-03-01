@@ -184,28 +184,38 @@ export async function getSongsByFilm(
   return rows.map(mapSongListItem);
 }
 
+export interface RecommendedSong extends SongListItem {
+  reason: string;
+}
+
 export async function getRecommendedSongs(
   songSlug: string,
-): Promise<SongListItem[]> {
+): Promise<RecommendedSong[]> {
   const rows = await read<Record<string, unknown>>(
-    `MATCH (seed:Song {slug: $slug})-[:BASED_ON_RAGA]->(sr:Raga)
+    `MATCH (seed:Song {slug: $slug})
+     OPTIONAL MATCH (seed)-[:BASED_ON_RAGA]->(sr:Raga)
+     WITH seed, collect(DISTINCT sr) AS seedRagas
+     WHERE size(seedRagas) > 0
      OPTIONAL MATCH (seed)-[:COMPOSED_BY]->(sc:Artist)
+     WITH seed, seedRagas, head(collect(DISTINCT sc)) AS sc
      OPTIONAL MATCH (seed)-[:FROM_FILM]->(sf:Film)
-     WITH seed, collect(sr) AS seedRagas, sc, sf
+     WITH seed, seedRagas, sc, head(collect(DISTINCT sf)) AS sf
      UNWIND seedRagas AS sr
      MATCH (candidate:Song)-[:BASED_ON_RAGA]->(sr)
      WHERE candidate <> seed
+     WITH candidate, seed, sc, sf, collect(DISTINCT sr.name) AS sharedRagaNames
      OPTIONAL MATCH (candidate)-[:FROM_FILM]->(cf:Film)
-     WITH candidate, seed, sc, sf, cf,
-          count(DISTINCT sr) AS sharedRagas
+     WITH candidate, seed, sc, sf, sharedRagaNames, head(collect(DISTINCT cf)) AS cf
      WHERE cf IS NULL OR sf IS NULL OR cf <> sf
      OPTIONAL MATCH (candidate)-[:COMPOSED_BY]->(cc:Artist)
-     WITH candidate, sharedRagas,
-          sharedRagas * 100
-          + CASE WHEN cc IS NOT NULL AND sc IS NOT NULL AND cc = cc AND cc = sc THEN 10 ELSE 0 END
+     WITH candidate, seed, sc, sharedRagaNames, head(collect(DISTINCT cc)) AS cc
+     WITH candidate, sharedRagaNames,
+          size(sharedRagaNames) * 100
+          + CASE WHEN cc IS NOT NULL AND sc IS NOT NULL AND cc = sc THEN 10 ELSE 0 END
           + CASE WHEN seed.year IS NOT NULL AND candidate.year IS NOT NULL
                THEN toFloat(10) / (abs(seed.year - candidate.year) + 1)
-               ELSE 0 END AS score
+               ELSE 0 END AS score,
+          CASE WHEN cc IS NOT NULL AND sc IS NOT NULL AND cc = sc THEN cc.name ELSE null END AS sharedComposerName
      ORDER BY score DESC
      LIMIT 6
      OPTIONAL MATCH (candidate)-[:BASED_ON_RAGA]->(r:Raga)
@@ -215,11 +225,34 @@ export async function getRecommendedSongs(
      RETURN properties(candidate) AS s,
             collect(DISTINCT {name: r.name, slug: r.slug}) AS ragas,
             collect(DISTINCT {name: singer.name, slug: singer.slug}) AS singers,
-            {name: composer.name, slug: composer.slug} AS composer,
-            {title: f.title, slug: f.slug} AS film`,
+            head(collect(DISTINCT {name: composer.name, slug: composer.slug})) AS composer,
+            head(collect(DISTINCT {title: f.title, slug: f.slug})) AS film,
+            sharedRagaNames,
+            sharedComposerName`,
     { slug: songSlug },
   );
-  return rows.map(mapSongListItem);
+  const seen = new Set<string>();
+  return rows
+    .map((row) => {
+      const song = mapSongListItem(row);
+      const ragaNames = row.sharedRagaNames as string[];
+      const composerName = row.sharedComposerName as string | null;
+      const parts: string[] = [];
+      if (ragaNames.length === 1) {
+        parts.push(`Also in Raga ${ragaNames[0]}`);
+      } else if (ragaNames.length > 1) {
+        parts.push(`Shares ragas ${ragaNames.join(", ")}`);
+      }
+      if (composerName) {
+        parts.push("Same composer");
+      }
+      return { ...song, reason: parts.join(" · ") };
+    })
+    .filter((song) => {
+      if (seen.has(song.slug)) return false;
+      seen.add(song.slug);
+      return true;
+    });
 }
 
 function neo4jInt(n: number) {

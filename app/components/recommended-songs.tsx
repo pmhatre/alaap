@@ -1,8 +1,8 @@
 import { SongCard } from "./song-card";
-import type { SongListItem } from "@/lib/data/songs";
+import type { RecommendedSong } from "@/lib/data/songs";
 
 interface RecommendedSongsProps {
-  songs: SongListItem[];
+  songs: RecommendedSong[];
 }
 
 export function RecommendedSongs({ songs }: RecommendedSongsProps) {
@@ -16,7 +16,14 @@ export function RecommendedSongs({ songs }: RecommendedSongsProps) {
       </p>
       <div className="mt-4">
         {songs.map((song) => (
-          <SongCard key={song.slug} song={song} />
+          <div key={song.slug}>
+            <SongCard song={song} />
+            {song.reason && (
+              <p className="-mt-2 mb-2 pl-0.5 text-xs italic text-stone-400">
+                {song.reason}
+              </p>
+            )}
+          </div>
         ))}
       </div>
     </div>
