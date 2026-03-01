@@ -134,18 +134,47 @@ Could be a simple force-directed graph or something more designed.
 
 ## Parking Lot
 
-### Language Tagging
+### ~~Language Tagging~~ ✓ Shipped
 
-Song nodes currently have no `language` property. South Indian songs (Tamil, Telugu, Kannada, Malayalam) show up alongside Hindi songs on raga pages and in search results with no way to distinguish or filter. Needs:
-
-- Add `language` property to Song nodes (likely infer from film metadata or source)
-- Language filter in search UI
-- Visual indicator on song cards (badge or subtitle)
-- Option to scope raga/artist pages by language
+All 4 scrapers emit language (Wikipedia captures from Lang column, others default Hindi). Search has language filter dropdown, song cards show purple badge for non-Hindi, song detail shows Language metadata row. ~230 non-Hindi songs (Telugu, Kannada, Tamil, Malayalam, Bengali, Marathi) now in DB. Future: normalize combined Wikipedia values ("Hindi&Telugu"), Hindi-first sorting on raga pages.
 
 ### ~~Relevance-Based Search Sorting~~ ✓ Shipped
 
-Implemented as a sort option in search. Relevance scoring: exact match > starts-with > contains. Pre-sorted before relationship expansion in Cypher. Future improvements: metadata richness weighting, source count boosting, Hindi-first sorting on raga pages once language tagging exists.
+Implemented as a sort option in search. Relevance scoring: exact match > starts-with > contains. Pre-sorted before relationship expansion in Cypher. Future improvements: metadata richness weighting, source count boosting.
+
+---
+
+## Ongoing: Design Refresh
+
+The app is functional but visually bare-bones. Given the subject matter (golden era Indian film music, classical tradition) and the project name (Alaap — the opening, exploratory movement of a raga), the design should reflect that identity. Areas to address:
+
+- **Color palette** — warm tones that evoke the era (golds, deep reds, cream), replacing the generic neutral Tailwind defaults
+- **Typography** — consider serif or display fonts for headings that nod to the period; Devanagari-friendly type pairing
+- **Visual identity** — logo/wordmark for "Alaap", subtle motifs or textures inspired by Indian classical aesthetics
+- **Layout refinement** — the home page, song detail, and raga pages deserve more considered information hierarchy and visual rhythm
+- **Dark mode** — consider whether a warm dark theme suits the content better
+- **Mobile polish** — responsive breakpoints work but aren't designed with care
+
+This is iterative, not a big-bang redesign. Can be tackled page-by-page.
+
+---
+
+## Ongoing: Domain Knowledge & Persona Enrichment
+
+The `/musicologist` and `/curator` personas in CLAUDE.md are behavioral prompts — they shape how Claude reasons about the domain but don't add knowledge Claude doesn't already have. The goal is to build toward PhD-level, encyclopedic domain expertise by giving the personas a real knowledge layer to draw on.
+
+### Knowledge layer (feeds the personas)
+
+- **Raga reference data** — aroha/avaroha/vadi/samvadi/pakad/thaat/time/rasa for all 278 ragas (Phase 2A enrichment, stored in Neo4j)
+- **Editorial annotations** — recording context, "why this matters" narratives, compositional analysis notes (Phase 3 F8/F9 content)
+- **Authoritative sources** — ingest from Chandrakantha raga descriptions, Rajan Parrikar essays, Wikipedia musicology sections
+- **Curated corrections** — a feedback loop where Praneet flags musicological errors and the correction gets persisted
+
+### Persona improvement path
+
+- Personas are static text in CLAUDE.md — they don't learn between sessions automatically
+- They improve when: (a) richer data enters the graph, (b) persona instructions get refined based on observed shortcomings, (c) retrieval paths are built so the persona pulls relevant context before answering
+- Long-term: the personas could be backed by a retrieval system (RAG over raga/composition reference material) rather than relying on Claude's training data alone
 
 ### Other Ideas
 
