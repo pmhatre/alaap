@@ -9,6 +9,7 @@ Phase 0 (scaffolding), Phase 1A (data seeding), Phase 1B (core pages), quick win
 ## Key Documentation
 - `docs/vision.md` — project vision, thesis, design principles
 - `docs/features.md` — feature roadmap (Phases 1-3 + parking lot)
+- `docs/SOURCES.md` — full attribution of all data sources (active + planned)
 - `docs/research/data-sources.md` — exhaustive data source assessment (Tiers 1-4)
 - `docs/research/data-ingestion-plan.md` — prioritized ingestion plan
 - `docs/architecture.md` — technical architecture, entity model, development phases
