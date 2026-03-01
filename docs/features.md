@@ -192,15 +192,19 @@ The Guru converges with F6 (Natural Language Search), F7 (Ornamentation), and th
 
 ### Three-stage build
 
-1. **Enrich the graph** (Phase 2A) — ✅ ragaDB ingested: 75 ragas enriched with aroha/avaroha/vadi/samvadi/pakad/timeOfDay, 10 Thaat nodes + BELONGS_TO_THAAT relationships created. Remaining: Chandrakantha (44 raga pages), Wikipedia raga table, LearnRagas (75). See `docs/research/guru-knowledge-sources.md` for full source assessment.
+1. **Enrich the graph** (Phase 2A) — Three sources ingested:
+   - ✅ **ragaDB**: 75 ragas enriched with aroha/avaroha/vadi/samvadi/pakad/timeOfDay
+   - ✅ **Chandrakantha**: 34 ragas get scholarly descriptions (first source for descriptions), thaat, vadi, samvadi, timeOfDay. Script: `scripts/enrich-chandrakantha.ts`
+   - ✅ **Wikipedia**: 65 ragas enriched via MediaWiki API Infobox raga parsing (aroha, avaroha, pakad, thaat). Script: `scripts/enrich-wikipedia.ts`
+   - **Current coverage**: 34 descriptions, 92 aroha, 92 thaat, 10 canonical Thaat nodes. Remaining: LearnRagas (75), Ocean of Ragas (1,800+). See `docs/research/guru-knowledge-sources.md`.
 2. **RAG-backed chat interface** (Phase 2B) — Build the NL search (F6) with the enriched graph as context. LLM queries the graph, retrieves relevant raga/song/artist data, and responds with the Guru's musicological voice.
 3. **Audio analysis** (Phase 3+, stretch) — Computational raga identification via compIAM/Saraga. Film songs are harder than solo classical (orchestration, loose raga treatment). Realistic for pure classical recordings, experimental for film songs.
 
 ### Knowledge layer (feeds the Guru)
 
-- **Raga reference data** — aroha/avaroha/vadi/samvadi/pakad/thaat/time for 75 ragas from ragaDB (Phase 2A, shipped). Remaining ~199 ragas need Chandrakantha/Wikipedia/LearnRagas sources.
+- **Raga reference data** — 92 ragas have aroha/avaroha/thaat (ragaDB + Wikipedia), 34 have scholarly descriptions (Chandrakantha). Three sources ingested; remaining ~182 ragas need LearnRagas/Ocean of Ragas.
 - **Editorial annotations** — recording context, "why this matters" narratives, compositional analysis notes (Phase 3 F8/F9 content)
-- **Authoritative sources** — ingest from ragaDB (primary seed), Chandrakantha raga descriptions, Rajan Parrikar essays, Wikipedia musicology sections. Full assessment: `docs/research/guru-knowledge-sources.md`
+- **Authoritative sources** — ragaDB (primary seed, 75 ragas), Chandrakantha (34 descriptions), Wikipedia Infobox (65 ragas). Remaining: Rajan Parrikar essays, LearnRagas. Full assessment: `docs/research/guru-knowledge-sources.md`
 - **Archivist knowledge** — recording history, industry context, commercial success data (see Archivist section above)
 - **Curated corrections** — a feedback loop where Praneet flags musicological errors and the correction gets persisted
 
@@ -221,18 +225,17 @@ Distinct from the musicological knowledge (raga theory, thaat system) — this i
 
 This knowledge feeds the `/curator` persona and enriches song annotations with historical depth. Sources: published interviews, documentaries (e.g., Lata Mangeshkar documentary with HMV head), biographies, oral history archives.
 
-### F11. Commercial Success & Charts (Binaca Geetmala)
+### ~~F11. Commercial Success & Charts (Binaca Geetmala)~~ ✓ Shipped
 
-A popularity-based discovery dimension alongside raga-based and artist-based browsing:
+Binaca Geetmala charts page at `/charts?year=YYYY`. 1,197 entries: full ranked charts (1953-1993) + #1 toppers (1994-2000). CSV source of truth with Neo4j enrichment for linked songs. Top 10 shown per year. Geetmala badges on song cards and detail pages. 486 songs matched to Neo4j.
 
-- **Binaca Geetmala integration** — Ameen Sayani's Radio Ceylon/Vividh Bharati countdown (1952-2000; switched platforms after 1994, continued in some form until ~2000). Annual top songs lists are well-documented online. A "Charts" or "Geetmala" page showing top songs by year, linked to our song detail pages.
-- **Hit song tagging** — Mark songs that were commercial blockbusters vs. critical favorites vs. cult classics
-- **Era-based popularity** — Which ragas produced the most hits? Which composers dominated which decades?
-- **Cross-reference with our data** — Overlay commercial success on top of raga/composer/singer dimensions for new insights
+#### F11b. Geetmala Aggregate Visualizations (future)
 
-This adds an entirely new axis of discovery. A user could browse "1960s Geetmala winners" and discover songs they'd never find through raga search alone.
-
-Data sources: Binaca Geetmala annual lists (available online), HMV/Saregama sales archives (if accessible), published chart data from film magazines of the era.
+- **Most charted singers** — who dominated the Geetmala across decades (Lata, Rafi, Kishore, Kumar Sanu eras)
+- **Most charted composers** — Shankar-Jaikishan vs Laxmikant-Pyarelal vs Nadeem-Shravan dominance by era
+- **Raga × popularity** — which ragas produced the most Geetmala hits? Do classical ragas chart differently than light compositions?
+- **Era analysis** — songs per film, composer concentration, singer diversity over time
+- **Interactive timeline** — visual arc of the Geetmala's 48-year run
 
 ### Other Ideas
 
