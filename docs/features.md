@@ -1,5 +1,18 @@
 # Feature Roadmap
 
+## North Star
+
+The raw data Alaap uses is a commodity — raga names, song metadata, artist catalogs all exist scattered across the internet. What makes Alaap uniquely valuable is the compounding intelligence layer built on top:
+
+1. **The graph structure** — Nobody else maps Indian film songs → ragas → thaats → composers → eras in a queryable knowledge graph. The relationships are the product, not the nodes.
+2. **The Guru's accumulated knowledge** — Every curated annotation, musicological insight, and "why this matters" narrative adds to a knowledge base that doesn't exist elsewhere. Over time, this becomes an authoritative reference.
+3. **Derived intelligence** — Novel insights that emerge from the combination: which composers stretched raga grammar, which decade had the most classical depth, which raga-mood combinations produce the most beloved compositions. These don't exist in any source we're ingesting.
+4. **Computational understanding** (long-term) — A system that can listen to a recording and place it in the Hindustani theoretical framework. This would be genuinely novel in a consumer-facing form.
+
+The unique value prop compounds with every feature built, every annotation written, and every pattern recognized across the graph.
+
+---
+
 ## Phase 1: Foundation (MVP) ✓
 
 ### F1. Multi-dimensional Search ✓
@@ -83,17 +96,23 @@ Conversational interface where users can ask open-ended questions:
 
 Powered by LLM with the knowledge graph as context.
 
-### F7. Search by Ornamentation (Alankar)
+### F7. Ornamentation (Alankar) — via Guru
 
-Surface songs that are classic examples of specific ornamentations:
+Originally scoped as "search by ornamentation" with metadata tagging, but alankar identification is inherently subjective and context-dependent (a murki shades into a kan swar depending on performer style). Metadata-based tagging hits a wall here.
+
+**Reframed approach**: Fold into the Guru co-pilot feature rather than building as standalone search.
+
+- **Curated annotations** (near-term) — Timestamped notes on specific compositions: "listen to Lata's meend at 2:15", "exceptional taan work in the antara". Stored as rich annotations on Song nodes. Start with the personal canon (F8) songs. The curator persona is the right voice for this.
+- **Guru-assisted identification** (mid-term) — The Guru uses its knowledge layer to suggest: "this passage likely contains gamak based on the melodic contour." Pattern recognition grounded in raga theory, not audio analysis.
+- **Computational detection** (stretch) — compIAM has some ornament detection, but film songs with orchestration make this much harder than solo classical. Bleeding-edge MIR research territory.
+
+Ornamentations to cover:
 
 - **Murki** — quick grace notes
 - **Gamak** — heavy oscillation
 - **Meend** — glide between notes
 - **Taan** — rapid melodic passages
 - **Kan swar** — touch notes
-
-Start as curated highlights rather than comprehensive tagging. Phase in over time.
 
 ---
 
@@ -157,17 +176,32 @@ The app is functional but visually bare-bones. Given the subject matter (golden 
 
 This is iterative, not a big-bang redesign. Can be tackled page-by-page.
 
+### Design system specifics identified
+
+- **Entity link legend** — amber/gold = raga, blue = artist, green = film. Currently undocumented to the user. Add a legend or tooltip system so the color-coding is self-explanatory, especially on the search results page.
+- **Artist role badges** — the artists listing page mixes singers, composers, and lyricists with no visual differentiation. Add role tags (e.g., "composer", "singer", "lyricist") or color-code by role. Data exists in the graph via relationship types (COMPOSED_BY, SUNG_BY, LYRICS_BY).
+- **Consistent visual language** — ensure the design system communicates entity types and relationships clearly across all pages.
+
 ---
 
-## Ongoing: Domain Knowledge & Persona Enrichment
+## Ongoing: Domain Knowledge & Persona Enrichment ("Guru" Co-Pilot)
 
-The `/musicologist` and `/curator` personas in CLAUDE.md are behavioral prompts — they shape how Claude reasons about the domain but don't add knowledge Claude doesn't already have. The goal is to build toward PhD-level, encyclopedic domain expertise by giving the personas a real knowledge layer to draw on.
+The `/musicologist` and `/curator` personas in CLAUDE.md are behavioral prompts — they shape how Claude reasons about the domain but don't add knowledge Claude doesn't already have. The goal is to build toward a "Guru" co-pilot: a PhD-level, encyclopedic Hindustani music expert grounded in Bhatkhande's systematization, available as an in-app feature.
 
-### Knowledge layer (feeds the personas)
+The Guru converges with F6 (Natural Language Search), F7 (Ornamentation), and the archivist knowledge layer. It's the single most ambitious feature on the roadmap — a chat-based interface where users can ask open-ended musicological questions and get answers grounded in real data.
 
-- **Raga reference data** — aroha/avaroha/vadi/samvadi/pakad/thaat/time/rasa for all 278 ragas (Phase 2A enrichment, stored in Neo4j)
+### Three-stage build
+
+1. **Enrich the graph** (Phase 2A) — ✅ ragaDB ingested: 75 ragas enriched with aroha/avaroha/vadi/samvadi/pakad/timeOfDay, 10 Thaat nodes + BELONGS_TO_THAAT relationships created. Remaining: Chandrakantha (44 raga pages), Wikipedia raga table, LearnRagas (75). See `docs/research/guru-knowledge-sources.md` for full source assessment.
+2. **RAG-backed chat interface** (Phase 2B) — Build the NL search (F6) with the enriched graph as context. LLM queries the graph, retrieves relevant raga/song/artist data, and responds with the Guru's musicological voice.
+3. **Audio analysis** (Phase 3+, stretch) — Computational raga identification via compIAM/Saraga. Film songs are harder than solo classical (orchestration, loose raga treatment). Realistic for pure classical recordings, experimental for film songs.
+
+### Knowledge layer (feeds the Guru)
+
+- **Raga reference data** — aroha/avaroha/vadi/samvadi/pakad/thaat/time for 75 ragas from ragaDB (Phase 2A, shipped). Remaining ~199 ragas need Chandrakantha/Wikipedia/LearnRagas sources.
 - **Editorial annotations** — recording context, "why this matters" narratives, compositional analysis notes (Phase 3 F8/F9 content)
-- **Authoritative sources** — ingest from Chandrakantha raga descriptions, Rajan Parrikar essays, Wikipedia musicology sections
+- **Authoritative sources** — ingest from ragaDB (primary seed), Chandrakantha raga descriptions, Rajan Parrikar essays, Wikipedia musicology sections. Full assessment: `docs/research/guru-knowledge-sources.md`
+- **Archivist knowledge** — recording history, industry context, commercial success data (see Archivist section above)
 - **Curated corrections** — a feedback loop where Praneet flags musicological errors and the correction gets persisted
 
 ### Persona improvement path
@@ -175,6 +209,30 @@ The `/musicologist` and `/curator` personas in CLAUDE.md are behavioral prompts 
 - Personas are static text in CLAUDE.md — they don't learn between sessions automatically
 - They improve when: (a) richer data enters the graph, (b) persona instructions get refined based on observed shortcomings, (c) retrieval paths are built so the persona pulls relevant context before answering
 - Long-term: the personas could be backed by a retrieval system (RAG over raga/composition reference material) rather than relying on Claude's training data alone
+
+### Archivist knowledge layer
+
+Distinct from the musicological knowledge (raga theory, thaat system) — this is the recording history and film industry knowledge domain:
+
+- **Recording stories** — who recorded where, studio conditions, retakes, creative disputes
+- **Industry context** — HMV/Columbia sales data, studio system dynamics, singer-composer partnerships and rivalries
+- **Cultural impact** — which songs became anthems, which were sleepers that found audiences later
+- **Production history** — the shift from mono to stereo, playback recording techniques, notable recording innovations
+
+This knowledge feeds the `/curator` persona and enriches song annotations with historical depth. Sources: published interviews, documentaries (e.g., Lata Mangeshkar documentary with HMV head), biographies, oral history archives.
+
+### F11. Commercial Success & Charts (Binaca Geetmala)
+
+A popularity-based discovery dimension alongside raga-based and artist-based browsing:
+
+- **Binaca Geetmala integration** — Ameen Sayani's Radio Ceylon/Vividh Bharati countdown (1952-2000; switched platforms after 1994, continued in some form until ~2000). Annual top songs lists are well-documented online. A "Charts" or "Geetmala" page showing top songs by year, linked to our song detail pages.
+- **Hit song tagging** — Mark songs that were commercial blockbusters vs. critical favorites vs. cult classics
+- **Era-based popularity** — Which ragas produced the most hits? Which composers dominated which decades?
+- **Cross-reference with our data** — Overlay commercial success on top of raga/composer/singer dimensions for new insights
+
+This adds an entirely new axis of discovery. A user could browse "1960s Geetmala winners" and discover songs they'd never find through raga search alone.
+
+Data sources: Binaca Geetmala annual lists (available online), HMV/Saregama sales archives (if accessible), published chart data from film magazines of the era.
 
 ### Other Ideas
 
