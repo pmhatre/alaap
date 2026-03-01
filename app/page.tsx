@@ -64,7 +64,7 @@ export default async function Home() {
       </div>
 
       {/* Browse cards */}
-      <div className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <BrowseCard
           href="/search"
           title="Search"
@@ -79,6 +79,11 @@ export default async function Home() {
           href="/artists"
           title="Artists"
           description="Singers, composers, and lyricists of the golden era"
+        />
+        <BrowseCard
+          href="/charts"
+          title="Charts"
+          description="Binaca Geetmala annual countdown — the golden era hit parade"
         />
       </div>
 

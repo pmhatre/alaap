@@ -20,6 +20,9 @@ export function Header() {
           <Link href="/artists" className="hover:text-maroon">
             Artists
           </Link>
+          <Link href="/charts" className="hover:text-maroon">
+            Charts
+          </Link>
         </nav>
       </div>
     </header>

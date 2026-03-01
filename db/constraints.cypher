@@ -44,3 +44,6 @@ FOR (f:Film) ON (f.title);
 
 CREATE INDEX film_year IF NOT EXISTS
 FOR (f:Film) ON (f.year);
+
+CREATE INDEX song_geetmala_year IF NOT EXISTS
+FOR (s:Song) ON (s.geetmala_year);

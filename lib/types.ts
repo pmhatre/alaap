@@ -13,6 +13,8 @@ export interface Song {
   spotifyId?: string;
   mood?: string[];
   notes?: string;
+  geetmala_rank?: number;
+  geetmala_year?: number;
   sources?: string[];
 }
 

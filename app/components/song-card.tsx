@@ -64,6 +64,11 @@ export function SongCard({ song }: SongCardProps) {
                 {song.language}
               </span>
             )}
+            {song.geetmala_rank != null && (
+              <span className="rounded bg-maroon/10 px-1.5 py-0.5 text-xs font-medium text-maroon">
+                Geetmala #{song.geetmala_rank}
+              </span>
+            )}
           </div>
         </div>
         {song.ragas.length > 0 && (

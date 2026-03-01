@@ -77,6 +77,13 @@ export default async function SongPage({ params }: Props) {
             <span className="text-sm">{song.taal.name}</span>
           </MetadataRow>
         )}
+        {song.geetmala_rank != null && song.geetmala_year != null && (
+          <MetadataRow label="Binaca Geetmala">
+            <span className="inline-block rounded bg-maroon/10 px-2 py-0.5 text-sm font-medium text-maroon">
+              #{song.geetmala_rank} ({song.geetmala_year})
+            </span>
+          </MetadataRow>
+        )}
         {song.language && song.language !== "Hindi" && (
           <MetadataRow label="Language">
             <span className="text-sm">{song.language}</span>
