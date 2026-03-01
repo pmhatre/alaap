@@ -52,6 +52,35 @@ export async function getAllRagas(
   };
 }
 
+export interface RelatedRaga {
+  name: string;
+  slug: string;
+  songCount: number;
+  reason: string;
+}
+
+export async function getRelatedRagas(
+  ragaSlug: string,
+): Promise<RelatedRaga[]> {
+  const rows = await read<Record<string, unknown>>(
+    `MATCH (seed:Raga {slug: $slug})-[:BELONGS_TO_THAAT]->(t:Thaat)<-[:BELONGS_TO_THAAT]-(sibling:Raga)
+     WHERE sibling <> seed
+     OPTIONAL MATCH (s:Song)-[:BASED_ON_RAGA]->(sibling)
+     WITH sibling, t, count(s) AS songCount
+     ORDER BY songCount DESC
+     LIMIT 6
+     RETURN sibling.name AS name, sibling.slug AS slug,
+            songCount, t.name AS thaatName`,
+    { slug: ragaSlug },
+  );
+  return rows.map((row) => ({
+    name: row.name as string,
+    slug: row.slug as string,
+    songCount: toNumber(row.songCount) ?? 0,
+    reason: `Same thaat (${row.thaatName})`,
+  }));
+}
+
 export async function getRagaSongCount(ragaSlug: string): Promise<number> {
   const rows = await read<Record<string, unknown>>(
     `MATCH (s:Song)-[:BASED_ON_RAGA]->(r:Raga {slug: $ragaSlug})

@@ -1,10 +1,11 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getRagaBySlug } from "@/lib/data/ragas";
+import { getRagaBySlug, getRelatedRagas } from "@/lib/data/ragas";
 import { getSongsByRaga } from "@/lib/data/songs";
 import { SongCard } from "@/app/components/song-card";
 import { Pagination } from "@/app/components/pagination";
 import { EmptyState } from "@/app/components/empty-state";
+import { RelatedRagas } from "@/app/components/related-ragas";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -25,10 +26,12 @@ export default async function RagaPage({ params, searchParams }: Props) {
   const { page: pageParam } = await searchParams;
   const page = Math.max(1, parseInt(pageParam ?? "1") || 1);
 
-  const raga = await getRagaBySlug(slug);
+  const [raga, { songs, total }, relatedRagas] = await Promise.all([
+    getRagaBySlug(slug),
+    getSongsByRaga(slug, page),
+    getRelatedRagas(slug),
+  ]);
   if (!raga) notFound();
-
-  const { songs, total } = await getSongsByRaga(slug, page);
 
   const properties = [
     { label: "Thaat", value: raga.thaat },
@@ -69,6 +72,9 @@ export default async function RagaPage({ params, searchParams }: Props) {
           {raga.description}
         </p>
       )}
+
+      {/* Related ragas */}
+      <RelatedRagas ragas={relatedRagas} />
 
       {/* Song list */}
       <div className="mt-8">

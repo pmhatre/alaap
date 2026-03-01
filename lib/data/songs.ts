@@ -184,6 +184,44 @@ export async function getSongsByFilm(
   return rows.map(mapSongListItem);
 }
 
+export async function getRecommendedSongs(
+  songSlug: string,
+): Promise<SongListItem[]> {
+  const rows = await read<Record<string, unknown>>(
+    `MATCH (seed:Song {slug: $slug})-[:BASED_ON_RAGA]->(sr:Raga)
+     OPTIONAL MATCH (seed)-[:COMPOSED_BY]->(sc:Artist)
+     OPTIONAL MATCH (seed)-[:FROM_FILM]->(sf:Film)
+     WITH seed, collect(sr) AS seedRagas, sc, sf
+     UNWIND seedRagas AS sr
+     MATCH (candidate:Song)-[:BASED_ON_RAGA]->(sr)
+     WHERE candidate <> seed
+     OPTIONAL MATCH (candidate)-[:FROM_FILM]->(cf:Film)
+     WITH candidate, seed, sc, sf, cf,
+          count(DISTINCT sr) AS sharedRagas
+     WHERE cf IS NULL OR sf IS NULL OR cf <> sf
+     OPTIONAL MATCH (candidate)-[:COMPOSED_BY]->(cc:Artist)
+     WITH candidate, sharedRagas,
+          sharedRagas * 100
+          + CASE WHEN cc IS NOT NULL AND sc IS NOT NULL AND cc = cc AND cc = sc THEN 10 ELSE 0 END
+          + CASE WHEN seed.year IS NOT NULL AND candidate.year IS NOT NULL
+               THEN toFloat(10) / (abs(seed.year - candidate.year) + 1)
+               ELSE 0 END AS score
+     ORDER BY score DESC
+     LIMIT 6
+     OPTIONAL MATCH (candidate)-[:BASED_ON_RAGA]->(r:Raga)
+     OPTIONAL MATCH (candidate)-[:SUNG_BY]->(singer:Artist)
+     OPTIONAL MATCH (candidate)-[:COMPOSED_BY]->(composer:Artist)
+     OPTIONAL MATCH (candidate)-[:FROM_FILM]->(f:Film)
+     RETURN properties(candidate) AS s,
+            collect(DISTINCT {name: r.name, slug: r.slug}) AS ragas,
+            collect(DISTINCT {name: singer.name, slug: singer.slug}) AS singers,
+            {name: composer.name, slug: composer.slug} AS composer,
+            {title: f.title, slug: f.slug} AS film`,
+    { slug: songSlug },
+  );
+  return rows.map(mapSongListItem);
+}
+
 function neo4jInt(n: number) {
   const neo4j = require("neo4j-driver").default;
   return neo4j.int(n);

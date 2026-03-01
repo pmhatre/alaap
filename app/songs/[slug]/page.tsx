@@ -1,8 +1,9 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getSongBySlug } from "@/lib/data/songs";
+import { getSongBySlug, getRecommendedSongs } from "@/lib/data/songs";
 import { EntityLink } from "@/app/components/entity-link";
 import { YouTubeEmbed } from "@/app/components/youtube-embed";
+import { RecommendedSongs } from "@/app/components/recommended-songs";
 import { LyricsSection } from "./lyrics-section";
 
 interface Props {
@@ -20,7 +21,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function SongPage({ params }: Props) {
   const { slug } = await params;
-  const song = await getSongBySlug(slug);
+  const [song, recommendedSongs] = await Promise.all([
+    getSongBySlug(slug),
+    getRecommendedSongs(slug),
+  ]);
   if (!song) notFound();
 
   return (
@@ -131,6 +135,9 @@ export default async function SongPage({ params }: Props) {
           </p>
         </div>
       )}
+
+      {/* Recommendations */}
+      <RecommendedSongs songs={recommendedSongs} />
 
       {/* Lyrics */}
       {song.lyrics && <LyricsSection lyrics={song.lyrics} />}
