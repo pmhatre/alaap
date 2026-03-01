@@ -68,9 +68,11 @@ export default async function RagaPage({ params, searchParams }: Props) {
       )}
 
       {raga.description && (
-        <p className="mt-4 text-sm leading-relaxed text-stone-600">
-          {raga.description}
-        </p>
+        <div className="mt-4 space-y-3 text-sm leading-relaxed text-stone-600">
+          {raga.description.split("\n\n").map((para, i) => (
+            <p key={i}>{para}</p>
+          ))}
+        </div>
       )}
 
       {/* Related ragas */}
