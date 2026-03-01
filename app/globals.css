@@ -1,1 +1,10 @@
 @import "tailwindcss";
+
+@theme {
+  --color-cream: #F0E8D8;
+  --color-maroon: #7A2E3C;
+}
+
+@utility font-heading {
+  font-family: var(--font-playfair), Georgia, serif;
+}

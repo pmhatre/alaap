@@ -8,12 +8,12 @@ interface SongCardProps {
 
 export function SongCard({ song }: SongCardProps) {
   return (
-    <div className="border-b border-neutral-100 py-3 last:border-b-0">
+    <div className="border-b border-stone-100 py-3 last:border-b-0">
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
           <Link
             href={`/songs/${song.slug}`}
-            className="font-medium text-neutral-900 hover:text-blue-700"
+            className="font-medium text-stone-900 hover:text-maroon"
           >
             {song.title}
           </Link>
@@ -30,11 +30,11 @@ export function SongCard({ song }: SongCardProps) {
               </svg>
             </a>
           )}
-          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-neutral-500">
+          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-stone-500">
             {song.filmTitle && song.filmSlug && (
               <Link
                 href={`/films/${song.filmSlug}`}
-                className="hover:text-neutral-700"
+                className="hover:text-stone-700"
               >
                 {song.filmTitle}
                 {song.year ? ` (${song.year})` : ""}

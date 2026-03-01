@@ -34,27 +34,27 @@ export function Pagination({
       {currentPage > 1 ? (
         <Link
           href={buildHref(currentPage - 1)}
-          className="rounded px-3 py-1.5 text-neutral-600 hover:bg-neutral-100"
+          className="rounded px-3 py-1.5 text-stone-600 hover:bg-stone-100"
         >
           &larr; Previous
         </Link>
       ) : (
-        <span className="rounded px-3 py-1.5 text-neutral-300">
+        <span className="rounded px-3 py-1.5 text-stone-300">
           &larr; Previous
         </span>
       )}
-      <span className="text-neutral-500">
+      <span className="text-stone-500">
         Page {currentPage} of {totalPages}
       </span>
       {currentPage < totalPages ? (
         <Link
           href={buildHref(currentPage + 1)}
-          className="rounded px-3 py-1.5 text-neutral-600 hover:bg-neutral-100"
+          className="rounded px-3 py-1.5 text-stone-600 hover:bg-stone-100"
         >
           Next &rarr;
         </Link>
       ) : (
-        <span className="rounded px-3 py-1.5 text-neutral-300">
+        <span className="rounded px-3 py-1.5 text-stone-300">
           Next &rarr;
         </span>
       )}

@@ -2,16 +2,16 @@
 
 The visual language for Alaap — a knowledge base for golden era Indian film music.
 
-**Aesthetic direction**: Warm scholarly. Cream backgrounds, serif headings, amber/gold accents. Like opening a well-kept personal music journal.
+**Aesthetic direction**: Warm scholarly. Deep parchment backgrounds, high-contrast serif headings, maroon accents. Like opening a well-kept personal music journal.
 
-**Inspiration**: Criterion Collection (scholarly + warm), Smithsonian Folkways (archival + earthy), 1950s–60s record sleeve typography. Not the clinical look of MusicBrainz or existing raga reference sites.
+**Inspiration**: "NĀD: Understanding Rāga Music" (Sandeep Bagchee) — warm parchment, deep maroon, decorative restraint. Also: Criterion Collection (scholarly + warm), Smithsonian Folkways (archival + earthy), 1950s–60s record sleeve typography. Not the clinical look of MusicBrainz or existing raga reference sites.
 
 ---
 
 ## 1. Core Principles
 
 ### Warmth over sterility
-Cream backgrounds, warm neutrals, serif headings. The subject matter is emotional — the design should reflect that. No cold whites, no clinical grays.
+Deep parchment backgrounds (`#F0E8D8`), warm stone neutrals, serif headings, maroon accents. The subject matter is emotional — the design should reflect that. No cold whites, no clinical grays.
 
 ### Color communicates entity type
 Amber = raga, blue = artist, green = film, purple = language. These colors are functional, not decorative. They teach the user the data model through repetition.
@@ -28,13 +28,13 @@ Consistent spacing, clear metadata hierarchy, whitespace as structural element. 
 
 ### Surfaces
 
-| Token | Current | Proposed | Value |
-|-------|---------|----------|-------|
-| `bg-page` | `white` | warm cream | `#FAF8F3` |
-| `bg-surface` | `neutral-50` | `stone-50` | Tailwind `stone-50` |
-| `bg-header` | `white/95` | warm cream/95 | `#FAF8F3` at 95% opacity |
+| Token | Value | Usage |
+|-------|-------|-------|
+| `bg-cream` | `#F0E8D8` | Page background, header, dropdown backgrounds |
+| `bg-stone-50` | Tailwind `stone-50` | Elevated surfaces — property grids, code blocks, lyrics |
+| `bg-cream/95` | `#F0E8D8` at 95% | Header with backdrop-blur |
 
-The background shift from white to cream is the single highest-impact change in the refresh. Apply it to `<body>` or the root layout wrapper.
+Defined as `--color-cream` in `globals.css` `@theme`, giving us `bg-cream`, `text-cream`, etc.
 
 ### Text Hierarchy
 
@@ -59,9 +59,11 @@ These are established and should not change. Document exact current classes:
 | **Language** | `bg-purple-50` | `text-purple-700` | — | Inline badge on non-Hindi songs |
 | **YouTube** | — | `text-red-500` | `hover:text-red-600` | Play icon only |
 
-### Accent
+### Accent — Maroon
 
-Primary accent: `amber-700` — for links, active states, and interactive highlights. Amber connects to the raga entity (the most central concept in Alaap) and carries warmth.
+Primary accent: `maroon` (`#7A2E3C`) — for the site logo, nav hovers, song title hovers, focus rings, section headings on home, card hover tints. Defined as `--color-maroon` in `globals.css` `@theme`, giving us `text-maroon`, `bg-maroon`, `border-maroon`, plus opacity modifiers like `bg-maroon/5`, `border-maroon/30`.
+
+Maroon is distinct from all entity colors and connects to the scholarly book aesthetic (NĀD cover). It's the "Alaap brand color" — not tied to any data entity.
 
 ### Borders
 
@@ -84,18 +86,18 @@ Primary accent: `amber-700` — for links, active states, and interactive highli
 
 | Role | Font | Source | Rationale |
 |------|------|--------|-----------|
-| **Headings** | EB Garamond | Google Fonts (serif) | Editorial weight, good Latin readability, warm character. Evokes scholarly music writing. |
-| **Body** | Inter | System / Google Fonts (sans-serif) | Clean, highly readable. Effectively already in use via Tailwind defaults. |
+| **Headings** | Playfair Display | Google Fonts (serif) | High stroke contrast (thick/thin), Didone character. Closest match to the NĀD book cover typography. |
+| **Body** | Inter | Google Fonts (sans-serif) | Clean, highly readable. |
 | **Notation** | System monospace | `font-mono` | Sargam sequences need fixed-width alignment. |
 
-Load EB Garamond via `next/font/google` in the root layout. Apply to a CSS variable (e.g., `--font-heading`) and reference via a Tailwind `font-heading` utility.
+Playfair Display loaded via `next/font/google` in `layout.tsx` as `--font-playfair`. The `font-heading` utility is defined in `globals.css` via `@utility` (not `@theme` — `var()` references don't work inside `@theme` in Tailwind v4).
 
 ### Scale
 
 | Token | Font | Size | Weight | Color | Usage |
 |-------|------|------|--------|-------|-------|
-| `heading-page` | EB Garamond | `text-3xl` | `font-bold` | `text-stone-900` | Page titles — "Raga Bhairavi", "Artists" |
-| `heading-section` | EB Garamond | `text-xl` | `font-semibold` | `text-stone-900` | Section headers — "Songs in Bhairavi" |
+| `heading-page` | Playfair Display | `text-3xl` | `font-bold` | `text-stone-900` | Page titles — "Raga Bhairavi", "Artists" |
+| `heading-section` | Playfair Display | `text-xl` | `font-semibold` | `text-maroon` (home) / `text-stone-900` | Section headers — "Songs in Bhairavi" |
 | `heading-card` | Inter | `text-base` | `font-semibold` | `text-stone-900` | Card titles, list item titles |
 | `body` | Inter | `text-sm` | `font-normal` | `text-stone-700` | Primary body content |
 | `body-secondary` | Inter | `text-sm` | `font-normal` | `text-stone-500` | Descriptions, metadata values |
@@ -106,7 +108,7 @@ Load EB Garamond via `next/font/google` in the root layout. Apply to a CSS varia
 
 - Max 3 font sizes per visual section.
 - Labels always lighter weight/color than their values.
-- Serif for headings only — never for body text or UI elements.
+- Serif (Playfair Display) for headings only — never for body text or UI elements.
 - Uppercase treatment (`uppercase tracking-wide`) reserved for metadata labels.
 
 ---
@@ -228,12 +230,12 @@ Plus entity-specific color classes from Section 6. No changes to structure neede
 
 ```
 Container: border-b border-stone-100 py-3 last:border-b-0
-Title:     font-medium text-stone-900 hover:text-amber-700
+Title:     font-medium text-stone-900 hover:text-maroon
 Metadata:  mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-stone-500
 Film link: hover:text-stone-700
 ```
 
-Changes from current: `neutral` → `stone`, title hover from `blue-700` → `amber-700` (aligns with accent color).
+Changes from original: `neutral` → `stone`, title hover from `blue-700` → `maroon` (aligns with accent color).
 
 ### Property Grid
 
@@ -265,7 +267,7 @@ Where `[entity-hover]` is the entity-specific hover from Section 6.
 ```
 Container: flex gap-1 border-b border-stone-200
 Tab:       px-4 py-2 text-sm font-medium text-stone-500 hover:text-stone-700
-Active:    border-b-2 border-blue-600 text-blue-700
+Active:    border-b-2 border-stone-900 text-stone-900
 ```
 
 Future: add role-specific visual cues (icon or subtle background tint) to differentiate Singer / Composer / Lyricist at a glance.
@@ -275,12 +277,12 @@ Future: add role-specific visual cues (icon or subtle background tint) to differ
 *Source: `app/components/header.tsx`*
 
 ```
-Container: sticky top-0 z-50 border-b border-stone-200 bg-[#FAF8F3]/95 backdrop-blur
-Logo:      font-heading text-xl font-bold tracking-tight text-stone-900
-Nav link:  text-sm font-medium text-stone-600 hover:text-stone-900
+Container: sticky top-0 z-50 border-t-2 border-t-maroon border-b border-b-stone-200 bg-cream/95 backdrop-blur
+Logo:      font-heading text-xl font-bold tracking-tight text-maroon
+Nav link:  text-sm font-medium text-stone-600 hover:text-maroon
 ```
 
-The logo ("Alaap") should use the serif heading font (EB Garamond) for brand identity.
+The thin maroon top border evokes the NĀD book spine. Logo in maroon + Playfair Display establishes brand identity.
 
 ### Search Input
 
@@ -288,14 +290,14 @@ The logo ("Alaap") should use the serif heading font (EB Garamond) for brand ide
 
 ```
 Input:      w-full rounded-lg border border-stone-200 px-4 py-2.5 text-sm
-            placeholder:text-stone-400 focus:border-amber-400 focus:outline-none
+            placeholder:text-stone-400 focus:border-maroon focus:outline-none
 Dropdown:   absolute z-50 mt-1 max-h-80 w-full overflow-auto rounded-lg
-            border border-stone-200 bg-white py-1 shadow-lg
+            border border-stone-200 bg-cream py-1 shadow-lg
 Active row: bg-stone-100 text-stone-900
 Hover row:  text-stone-700 hover:bg-stone-50
 ```
 
-Change from current: focus border from `neutral-400` → `amber-400` (accent color on focus).
+Focus border uses maroon accent color.
 
 ### Pagination
 
@@ -323,10 +325,12 @@ Message:   text-lg text-stone-400
 
 ### Home
 
-- Hero section with serif heading, warm background
-- Featured ragas grid (top ragas by song count) with amber hover cards
-- Browse category cards (Ragas, Artists, Films) with entity-colored borders
-- Entity legend near browse section — teaches color = entity type
+- Hero: "Alaap" in `text-5xl text-maroon font-heading`, ornamental divider (`✻` flanked by maroon lines)
+- Stats row with maroon-tinted dividers
+- Entity color legend (amber/blue/green dots) below stats
+- Browse category cards with `hover:border-maroon/30 hover:bg-maroon/5`
+- Featured ragas grid with same maroon hover treatment
+- Well-documented songs list
 
 ### Raga Detail
 
@@ -376,7 +380,7 @@ Message:   text-lg text-stone-400
 
 **Don't** apply decorative color to non-entity elements. Color = meaning.
 
-**Don't** use sans-serif for page-level headings. Serif (EB Garamond) is the heading font.
+**Don't** use sans-serif for page-level headings. Serif (Playfair Display) is the heading font.
 
 **Don't** show redundant entity badges. Example: every song on the "Raga Bhairavi" page already shares that raga — remove the amber "Bhairavi" pill from each song card on that page.
 
@@ -392,15 +396,15 @@ Message:   text-lg text-stone-400
 
 Use this for every page or component touched during the design refresh:
 
-- [ ] Background uses warm cream (`#FAF8F3`), not white
-- [ ] Page headings use serif font (EB Garamond)
-- [ ] All text colors use `stone-*`, not `gray-*` or `neutral-*`
-- [ ] Entity links use correct color for their entity type
-- [ ] Borders use `stone-200` / `stone-100`
+- [x] Background uses warm parchment (`bg-cream` / `#F0E8D8`), not white
+- [x] Page headings use serif font (Playfair Display via `font-heading`)
+- [x] All text colors use `stone-*`, not `gray-*` or `neutral-*`
+- [x] Entity links use correct color for their entity type
+- [x] Borders use `stone-200` / `stone-100`
 - [ ] Spacing follows the token scale (Section 5)
-- [ ] Interactive elements have hover/focus states
-- [ ] Focus states use accent color (`amber-400` border)
-- [ ] Musical notation uses `font-mono tracking-widest`
+- [x] Interactive elements have hover/focus states
+- [x] Focus states use maroon accent (`focus:border-maroon`)
+- [x] Musical notation uses `font-mono tracking-widest`
 - [ ] Max 3 text sizes per visual section
 - [ ] No redundant entity badges on single-entity pages
 - [ ] Mobile responsive (test at 375px width)

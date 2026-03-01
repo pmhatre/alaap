@@ -18,8 +18,8 @@ export default async function RagasPage({ searchParams }: Props) {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
-      <h1 className="text-3xl font-bold tracking-tight">Ragas</h1>
-      <p className="mt-2 text-neutral-500">
+      <h1 className="font-heading text-3xl font-bold tracking-tight">Ragas</h1>
+      <p className="mt-2 text-stone-500">
         Browse ragas by number of songs in the collection.
       </p>
 
@@ -28,10 +28,10 @@ export default async function RagasPage({ searchParams }: Props) {
           <Link
             key={raga.slug}
             href={`/ragas/${raga.slug}`}
-            className="flex items-center justify-between rounded-lg border border-neutral-100 px-4 py-3 transition-colors hover:border-amber-200 hover:bg-amber-50/50"
+            className="flex items-center justify-between rounded-lg border border-stone-100 px-4 py-3 transition-colors hover:border-amber-200 hover:bg-amber-50/50"
           >
             <span className="font-medium">{raga.name}</span>
-            <span className="text-sm text-neutral-400">
+            <span className="text-sm text-stone-400">
               {raga.songCount} songs
             </span>
           </Link>

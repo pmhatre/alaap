@@ -26,11 +26,11 @@ export default async function SongPage({ params }: Props) {
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
       {/* Header */}
-      <h1 className="text-3xl font-bold tracking-tight">{song.title}</h1>
+      <h1 className="font-heading text-3xl font-bold tracking-tight">{song.title}</h1>
       {song.titleDevanagari && (
-        <p className="mt-1 text-lg text-neutral-500">{song.titleDevanagari}</p>
+        <p className="mt-1 text-lg text-stone-500">{song.titleDevanagari}</p>
       )}
-      <div className="mt-2 flex flex-wrap items-center gap-2 text-neutral-600">
+      <div className="mt-2 flex flex-wrap items-center gap-2 text-stone-600">
         {song.film && (
           <EntityLink
             type="film"
@@ -39,7 +39,7 @@ export default async function SongPage({ params }: Props) {
           />
         )}
         {!song.film && song.year && (
-          <span className="text-sm text-neutral-500">{song.year}</span>
+          <span className="text-sm text-stone-500">{song.year}</span>
         )}
       </div>
 
@@ -87,7 +87,7 @@ export default async function SongPage({ params }: Props) {
       {/* Ragas */}
       {song.ragas.length > 0 && (
         <div className="mt-6">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-400">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-stone-400">
             Raga
           </h2>
           <div className="mt-2 space-y-2">
@@ -95,7 +95,7 @@ export default async function SongPage({ params }: Props) {
               <div key={raga.slug} className="rounded-lg border border-amber-100 bg-amber-50/50 p-3">
                 <EntityLink type="raga" slug={raga.slug} name={raga.name} />
                 {(raga.timeOfDay || raga.rasa) && (
-                  <div className="mt-1 flex gap-3 text-xs text-neutral-500">
+                  <div className="mt-1 flex gap-3 text-xs text-stone-500">
                     {raga.timeOfDay && <span>Time: {raga.timeOfDay}</span>}
                     {raga.rasa && <span>Rasa: {raga.rasa}</span>}
                   </div>
@@ -116,10 +116,10 @@ export default async function SongPage({ params }: Props) {
       {/* Notes */}
       {song.notes && (
         <div className="mt-6">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-400">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-stone-400">
             Notes
           </h2>
-          <p className="mt-2 text-sm leading-relaxed text-neutral-700">
+          <p className="mt-2 text-sm leading-relaxed text-stone-700">
             {song.notes}
           </p>
         </div>
@@ -140,7 +140,7 @@ function MetadataRow({
 }) {
   return (
     <div>
-      <span className="text-xs font-medium uppercase tracking-wide text-neutral-400">
+      <span className="text-xs font-medium uppercase tracking-wide text-stone-400">
         {label}
       </span>
       <div className="mt-0.5">{children}</div>

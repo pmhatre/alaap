@@ -37,15 +37,15 @@ export async function ArtistTabs({
   return (
     <div>
       {/* Tab buttons */}
-      <div className="flex gap-1 border-b border-neutral-200">
+      <div className="flex gap-1 border-b border-stone-200">
         {roles.map((r) => (
           <Link
             key={r.role}
             href={`/artists/${artistSlug}?role=${r.role}`}
             className={`px-4 py-2 text-sm font-medium transition-colors ${
               r.role === currentRole
-                ? "border-b-2 border-neutral-900 text-neutral-900"
-                : "text-neutral-500 hover:text-neutral-700"
+                ? "border-b-2 border-stone-900 text-stone-900"
+                : "text-stone-500 hover:text-stone-700"
             }`}
           >
             {roleLabels[r.role]} ({r.count})

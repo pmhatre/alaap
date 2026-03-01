@@ -38,21 +38,21 @@ export default async function ArtistPage({ params, searchParams }: Props) {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
-      <h1 className="text-3xl font-bold tracking-tight">{artist.name}</h1>
+      <h1 className="font-heading text-3xl font-bold tracking-tight">{artist.name}</h1>
       {artist.nameDevanagari && (
-        <p className="mt-1 text-lg text-neutral-500">
+        <p className="mt-1 text-lg text-stone-500">
           {artist.nameDevanagari}
         </p>
       )}
       {(artist.birthYear || artist.deathYear) && (
-        <p className="mt-1 text-sm text-neutral-500">
+        <p className="mt-1 text-sm text-stone-500">
           {artist.birthYear}
           {artist.deathYear ? ` – ${artist.deathYear}` : ""}
         </p>
       )}
 
       {artist.bio && (
-        <p className="mt-4 text-sm leading-relaxed text-neutral-600">
+        <p className="mt-4 text-sm leading-relaxed text-stone-600">
           {artist.bio}
         </p>
       )}
@@ -60,14 +60,14 @@ export default async function ArtistPage({ params, searchParams }: Props) {
       {/* Signature ragas */}
       {topRagas.length > 0 && (
         <div className="mt-6">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-400">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-stone-400">
             Signature ragas
           </h2>
           <div className="mt-2 flex flex-wrap gap-2">
             {topRagas.map((r) => (
               <span key={r.slug} className="inline-flex items-center gap-1">
                 <EntityLink type="raga" slug={r.slug} name={r.name} />
-                <span className="text-xs text-neutral-400">
+                <span className="text-xs text-stone-400">
                   ({r.songCount})
                 </span>
               </span>
@@ -79,14 +79,14 @@ export default async function ArtistPage({ params, searchParams }: Props) {
       {/* Collaborators */}
       {collaborators.length > 0 && (
         <div className="mt-6">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-400">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-stone-400">
             Top collaborators
           </h2>
           <div className="mt-2 flex flex-wrap gap-2">
             {collaborators.map((c) => (
               <span key={c.slug} className="inline-flex items-center gap-1">
                 <EntityLink type="artist" slug={c.slug} name={c.name} />
-                <span className="text-xs text-neutral-400">
+                <span className="text-xs text-stone-400">
                   ({c.sharedSongs})
                 </span>
               </span>

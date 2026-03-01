@@ -27,7 +27,7 @@ export function YouTubeEmbed({ youtubeId, title }: YouTubeEmbedProps) {
   return (
     <button
       onClick={() => setLoaded(true)}
-      className="group relative aspect-video w-full overflow-hidden rounded-lg bg-neutral-100"
+      className="group relative aspect-video w-full overflow-hidden rounded-lg bg-stone-100"
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img

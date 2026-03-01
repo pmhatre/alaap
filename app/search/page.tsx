@@ -59,8 +59,8 @@ export default async function SearchPage({ searchParams }: Props) {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
-      <h1 className="text-3xl font-bold tracking-tight">Search</h1>
-      <p className="mt-2 text-sm text-neutral-500">
+      <h1 className="font-heading text-3xl font-bold tracking-tight">Search</h1>
+      <p className="mt-2 text-sm text-stone-500">
         {total.toLocaleString()} songs
       </p>
 

@@ -171,7 +171,7 @@ export function SearchFilters({ filterOptions }: SearchFiltersProps) {
           )}
           <button
             onClick={clearAll}
-            className="text-xs text-neutral-500 hover:text-neutral-700"
+            className="text-xs text-stone-500 hover:text-stone-700"
           >
             Clear all
           </button>
@@ -196,7 +196,7 @@ function FilterSelect({
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="rounded-lg border border-neutral-200 px-3 py-1.5 text-sm text-neutral-700 focus:border-neutral-400 focus:outline-none"
+      className="rounded-lg border border-stone-200 px-3 py-1.5 text-sm text-stone-700 focus:border-maroon focus:outline-none"
     >
       <option value="">{label}</option>
       {options.map((o) => (
@@ -221,7 +221,7 @@ function SortSelect({
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="ml-auto rounded-lg border border-neutral-200 px-3 py-1.5 text-sm text-neutral-700 focus:border-neutral-400 focus:outline-none"
+      className="ml-auto rounded-lg border border-stone-200 px-3 py-1.5 text-sm text-stone-700 focus:border-maroon focus:outline-none"
     >
       <option value="year_desc">Newest first</option>
       <option value="year_asc">Oldest first</option>
@@ -239,11 +239,11 @@ function FilterChip({
   onClear: () => void;
 }) {
   return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-neutral-100 px-2.5 py-1 text-xs font-medium text-neutral-700">
+    <span className="inline-flex items-center gap-1 rounded-full bg-stone-100 px-2.5 py-1 text-xs font-medium text-stone-700">
       {label}
       <button
         onClick={onClear}
-        className="ml-0.5 text-neutral-400 hover:text-neutral-600"
+        className="ml-0.5 text-stone-400 hover:text-stone-600"
       >
         &times;
       </button>

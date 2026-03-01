@@ -105,7 +105,7 @@ export function SearchInput({ defaultValue, onSubmit }: SearchInputProps) {
         onFocus={() => {
           if (suggestions.length > 0) setIsOpen(true);
         }}
-        className="w-full rounded-lg border border-neutral-200 px-4 py-2.5 text-sm placeholder:text-neutral-400 focus:border-neutral-400 focus:outline-none"
+        className="w-full rounded-lg border border-stone-200 px-4 py-2.5 text-sm placeholder:text-stone-400 focus:border-maroon focus:outline-none"
         role="combobox"
         aria-expanded={isOpen}
         aria-autocomplete="list"
@@ -116,7 +116,7 @@ export function SearchInput({ defaultValue, onSubmit }: SearchInputProps) {
       {isOpen && suggestions.length > 0 && (
         <ul
           role="listbox"
-          className="absolute z-50 mt-1 max-h-80 w-full overflow-auto rounded-lg border border-neutral-200 bg-white py-1 shadow-lg"
+          className="absolute z-50 mt-1 max-h-80 w-full overflow-auto rounded-lg border border-stone-200 bg-cream py-1 shadow-lg"
         >
           {suggestions.map((s, i) => (
             <li
@@ -126,8 +126,8 @@ export function SearchInput({ defaultValue, onSubmit }: SearchInputProps) {
               aria-selected={i === activeIndex}
               className={`cursor-pointer px-4 py-2 text-sm ${
                 i === activeIndex
-                  ? "bg-neutral-100 text-neutral-900"
-                  : "text-neutral-700 hover:bg-neutral-50"
+                  ? "bg-stone-100 text-stone-900"
+                  : "text-stone-700 hover:bg-stone-50"
               }`}
               onMouseEnter={() => setActiveIndex(i)}
               onClick={() => {
@@ -137,7 +137,7 @@ export function SearchInput({ defaultValue, onSubmit }: SearchInputProps) {
             >
               <span className="font-medium">{s.title}</span>
               {(s.filmTitle || s.year) && (
-                <span className="ml-2 text-neutral-400">
+                <span className="ml-2 text-stone-400">
                   {s.filmTitle && s.filmTitle}
                   {s.filmTitle && s.year && " "}
                   {s.year && `(${s.year})`}

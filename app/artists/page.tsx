@@ -52,8 +52,8 @@ export default async function ArtistsPage({ searchParams }: Props) {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
-      <h1 className="text-3xl font-bold tracking-tight">Artists</h1>
-      <p className="mt-2 text-neutral-500">
+      <h1 className="font-heading text-3xl font-bold tracking-tight">Artists</h1>
+      <p className="mt-2 text-stone-500">
         Singers, composers, and lyricists by number of songs.
       </p>
 
@@ -62,10 +62,10 @@ export default async function ArtistsPage({ searchParams }: Props) {
           <Link
             key={artist.slug}
             href={`/artists/${artist.slug}`}
-            className="flex items-center justify-between rounded-lg border border-neutral-100 px-4 py-3 transition-colors hover:border-blue-200 hover:bg-blue-50/50"
+            className="flex items-center justify-between rounded-lg border border-stone-100 px-4 py-3 transition-colors hover:border-blue-200 hover:bg-blue-50/50"
           >
             <span className="font-medium">{artist.name}</span>
-            <span className="text-sm text-neutral-400">
+            <span className="text-sm text-stone-400">
               {artist.songCount} songs
             </span>
           </Link>
@@ -77,27 +77,27 @@ export default async function ArtistsPage({ searchParams }: Props) {
           {page > 1 ? (
             <Link
               href={page === 2 ? "/artists" : `/artists?page=${page - 1}`}
-              className="rounded px-3 py-1.5 text-neutral-600 hover:bg-neutral-100"
+              className="rounded px-3 py-1.5 text-stone-600 hover:bg-stone-100"
             >
               &larr; Previous
             </Link>
           ) : (
-            <span className="rounded px-3 py-1.5 text-neutral-300">
+            <span className="rounded px-3 py-1.5 text-stone-300">
               &larr; Previous
             </span>
           )}
-          <span className="text-neutral-500">
+          <span className="text-stone-500">
             Page {page} of {totalPages}
           </span>
           {page < totalPages ? (
             <Link
               href={`/artists?page=${page + 1}`}
-              className="rounded px-3 py-1.5 text-neutral-600 hover:bg-neutral-100"
+              className="rounded px-3 py-1.5 text-stone-600 hover:bg-stone-100"
             >
               Next &rarr;
             </Link>
           ) : (
-            <span className="rounded px-3 py-1.5 text-neutral-300">
+            <span className="rounded px-3 py-1.5 text-stone-300">
               Next &rarr;
             </span>
           )}
