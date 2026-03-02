@@ -4,7 +4,7 @@
 A knowledge base and exploratory interface for golden era Indian film music (late 1940s-1970s), with emphasis on classical and semi-classical compositions. Built as a personal project by Praneet Mhatre.
 
 ## Project Status
-Phase 0 (scaffolding), Phase 1A (data seeding), Phase 1B (core pages), quick wins, and Phase 2A (ragaDB enrichment) complete. Post-dedup, Neo4j has ~14.5K songs, ~4.5K artists, ~4.4K films, 274 ragas (75 enriched with musicological properties), 10 thaats, 37 taals from 5 sources. Songs and films have language tags; Wikipedia scraper includes non-Hindi songs (~230 non-Hindi). Raga detail pages now show aroha, avaroha, vadi, samvadi, pakad, timeOfDay, and thaat for enriched ragas.
+Phase 0 (scaffolding), Phase 1A (data seeding), Phase 1B (core pages), quick wins, Phase 2A (ragaDB enrichment), and F8 (Favorites) complete. Post-dedup, Neo4j has ~14.5K songs, ~4.5K artists, ~4.4K films, 274 ragas (75 enriched with musicological properties), 10 thaats, 37 taals from 5 sources. Songs and films have language tags; Wikipedia scraper includes non-Hindi songs (~230 non-Hindi). Raga detail pages now show aroha, avaroha, vadi, samvadi, pakad, timeOfDay, and thaat for enriched ragas. Favorites page at `/favorites` with 5 curated songs and personal annotations.
 
 ## Key Documentation
 - `docs/vision.md` — project vision, thesis, design principles
@@ -17,16 +17,18 @@ Phase 0 (scaffolding), Phase 1A (data seeding), Phase 1B (core pages), quick win
 ## Project Structure
 - `app/` — Next.js 15 App Router
   - `components/` — shared UI: `header`, `song-card`, `pagination`, `entity-link`, `empty-state`, `youtube-embed`
+  - `data/` — curated flat files: `favorites.json` (song slugs, annotations, listenFor notes)
   - `songs/[slug]/` — song detail page + lyrics toggle
   - `ragas/` — raga listing + `[slug]/` detail page
   - `artists/` — artist listing + `[slug]/` profile with role tabs
   - `films/` — paginated films listing + `[slug]/` detail page
+  - `favorites/` — Praneet's Favorites personal canon page
   - `search/` — search with filters, autocomplete (`search-input.tsx`), and sort options
   - `api/search/suggest/` — autocomplete API route (song title suggestions with relevance tiering)
 - `lib/` — shared modules
   - `neo4j.ts` — driver singleton, `read()`/`write()` helpers
   - `types.ts` — entity interfaces (Song, Raga, Artist, Film, Taal, etc.)
-  - `data/` — typed Cypher query functions: `songs.ts`, `ragas.ts`, `artists.ts`, `films.ts`, `search.ts`, `home.ts`, `utils.ts`
+  - `data/` — typed Cypher query functions: `songs.ts`, `ragas.ts`, `artists.ts`, `films.ts`, `search.ts`, `home.ts`, `favorites.ts`, `utils.ts`
 - `pipeline/` — Python data pipeline
   - `normalizers/` — curated dictionaries for artist names (~50), ragas (80+), song canonical IDs
   - `scrapers/` — 4 source scrapers: `bollywood_lyrics`, `carvaan`, `chandrakantha`, `wikipedia`

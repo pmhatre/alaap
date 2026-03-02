@@ -118,16 +118,9 @@ Ornamentations to cover:
 
 ## Phase 3: Soul & Community
 
-### F8. Praneet's Favorites / Personal Canon
+### ~~F8. Praneet's Favorites / Personal Canon~~ ✓ Shipped
 
-A curated, personal section:
-
-- The songs that drew me into classical-leaning Hindi film music
-- Personal annotations — why each song matters, the story of discovering it
-- A guided journey for newcomers ("start here, then explore these")
-- Adds soul and personal voice to what could otherwise feel like a database
-
-This is NOT optional — it's what makes the project feel alive and human.
+Curated `/favorites` page with personal annotations. JSON config at `app/data/favorites.json` stores song slugs, annotation text, and "Listen for" notes; song metadata hydrated from Neo4j via `getSongBySlug()` at render time. MVP: 5 songs (Saiyan Beimaan, Dhoondho Dhoondho Re Saajna, O Duniya Ke Rakhwale, Aa Ab Laut Chalen, Jhoothe Naina Bole). Each entry has multi-paragraph editorial annotation, entity links (raga/artist/film), YouTube embed where available, and a "Listen for" callout highlighting specific musical moments. Data layer: `lib/data/favorites.ts`. Expandable by adding entries to the JSON file.
 
 ### F9. Guided Journeys / Curated Pathways
 
