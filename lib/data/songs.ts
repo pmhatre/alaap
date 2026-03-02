@@ -95,11 +95,16 @@ export async function getSongBySlug(
 export async function getSongsByRaga(
   ragaSlug: string,
   page: number = 1,
+  language: string = "Hindi",
 ): Promise<{ songs: SongListItem[]; total: number }> {
   const skip = (page - 1) * PAGE_SIZE;
+  const langFilter = language
+    ? "WHERE s.language = $language OR s.language IS NULL"
+    : "";
   const [songsResult, countResult] = await Promise.all([
     read<Record<string, unknown>>(
       `MATCH (s:Song)-[:BASED_ON_RAGA]->(r:Raga {slug: $ragaSlug})
+       ${langFilter}
        OPTIONAL MATCH (s)-[:BASED_ON_RAGA]->(allR:Raga)
        OPTIONAL MATCH (s)-[:SUNG_BY]->(singer:Artist)
        OPTIONAL MATCH (s)-[:COMPOSED_BY]->(composer:Artist)
@@ -111,12 +116,13 @@ export async function getSongsByRaga(
               {title: f.title, slug: f.slug} AS film
        ORDER BY s.year DESC
        SKIP $skip LIMIT $limit`,
-      { ragaSlug, skip: neo4jInt(skip), limit: neo4jInt(PAGE_SIZE) },
+      { ragaSlug, language, skip: neo4jInt(skip), limit: neo4jInt(PAGE_SIZE) },
     ),
     read<Record<string, unknown>>(
       `MATCH (s:Song)-[:BASED_ON_RAGA]->(r:Raga {slug: $ragaSlug})
+       ${langFilter}
        RETURN count(s) AS total`,
-      { ragaSlug },
+      { ragaSlug, language },
     ),
   ]);
   return {

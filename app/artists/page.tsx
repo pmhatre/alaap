@@ -15,7 +15,14 @@ interface ArtistListItem {
   name: string;
   slug: string;
   songCount: number;
+  roles: ("singer" | "composer" | "lyricist")[];
 }
+
+const roleStyles: Record<string, string> = {
+  singer: "bg-blue-50 text-blue-700",
+  composer: "bg-amber-50 text-amber-700",
+  lyricist: "bg-green-50 text-green-700",
+};
 
 export default async function ArtistsPage({ searchParams }: Props) {
   const { page: pageParam } = await searchParams;
@@ -28,7 +35,13 @@ export default async function ArtistsPage({ searchParams }: Props) {
     read<Record<string, unknown>>(
       `MATCH (a:Artist)<-[:SUNG_BY|COMPOSED_BY|LYRICS_BY]-(s:Song)
        WITH a, count(DISTINCT s) AS songCount
-       RETURN a.name AS name, a.slug AS slug, songCount
+       OPTIONAL MATCH (s1:Song)-[:SUNG_BY]->(a)
+       WITH a, songCount, count(DISTINCT s1) AS sc
+       OPTIONAL MATCH (s2:Song)-[:COMPOSED_BY]->(a)
+       WITH a, songCount, sc, count(DISTINCT s2) AS cc
+       OPTIONAL MATCH (s3:Song)-[:LYRICS_BY]->(a)
+       RETURN a.name AS name, a.slug AS slug, songCount,
+              sc > 0 AS isSinger, cc > 0 AS isComposer, count(DISTINCT s3) > 0 AS isLyricist
        ORDER BY songCount DESC
        SKIP $skip LIMIT $limit`,
       { skip: neo4j.int(skip), limit: neo4j.int(PAGE_SIZE) },
@@ -41,11 +54,18 @@ export default async function ArtistsPage({ searchParams }: Props) {
     ),
   ]);
 
-  const artists: ArtistListItem[] = artistRows.map((r) => ({
-    name: r.name as string,
-    slug: r.slug as string,
-    songCount: toNumber(r.songCount) ?? 0,
-  }));
+  const artists: ArtistListItem[] = artistRows.map((r) => {
+    const roles: ("singer" | "composer" | "lyricist")[] = [];
+    if (r.isSinger) roles.push("singer");
+    if (r.isComposer) roles.push("composer");
+    if (r.isLyricist) roles.push("lyricist");
+    return {
+      name: r.name as string,
+      slug: r.slug as string,
+      songCount: toNumber(r.songCount) ?? 0,
+      roles,
+    };
+  });
   const total = toNumber(countRows[0]?.total) ?? 0;
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
@@ -62,12 +82,24 @@ export default async function ArtistsPage({ searchParams }: Props) {
           <Link
             key={artist.slug}
             href={`/artists/${artist.slug}`}
-            className="flex items-center justify-between rounded-lg border border-stone-100 px-4 py-3 transition-colors hover:border-blue-200 hover:bg-blue-50/50"
+            className="flex flex-col gap-1.5 rounded-lg border border-stone-100 px-4 py-3 transition-colors hover:border-blue-200 hover:bg-blue-50/50"
           >
-            <span className="font-medium">{artist.name}</span>
-            <span className="text-sm text-stone-400">
-              {artist.songCount} songs
-            </span>
+            <div className="flex items-center justify-between">
+              <span className="font-medium">{artist.name}</span>
+              <span className="text-sm text-stone-400">
+                {artist.songCount} songs
+              </span>
+            </div>
+            <div className="flex gap-1">
+              {artist.roles.map((role) => (
+                <span
+                  key={role}
+                  className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${roleStyles[role]}`}
+                >
+                  {role}
+                </span>
+              ))}
+            </div>
           </Link>
         ))}
       </div>

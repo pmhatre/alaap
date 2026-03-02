@@ -2,16 +2,14 @@ import Link from "next/link";
 import {
   getHomeStats,
   getFeaturedRagas,
-  getRecentlyAddedSongs,
 } from "@/lib/data/home";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const [stats, featuredRagas, recentSongs] = await Promise.all([
+  const [stats, featuredRagas] = await Promise.all([
     getHomeStats(),
     getFeaturedRagas(10),
-    getRecentlyAddedSongs(10),
   ]);
 
   return (
@@ -45,22 +43,6 @@ export default async function Home() {
         <StatItem label="Films" value={stats.films} />
         <StatDivider />
         <StatItem label="Taals" value={stats.taals} />
-      </div>
-
-      {/* Entity color legend */}
-      <div className="mt-8 flex items-center justify-center gap-4 text-xs text-stone-400">
-        <span className="flex items-center gap-1.5">
-          <span className="inline-block h-2 w-2 rounded-full bg-amber-400" />
-          Ragas
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className="inline-block h-2 w-2 rounded-full bg-blue-400" />
-          Artists
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className="inline-block h-2 w-2 rounded-full bg-green-400" />
-          Films
-        </span>
       </div>
 
       {/* Browse cards */}
@@ -111,39 +93,6 @@ export default async function Home() {
         </section>
       )}
 
-      {/* Recent songs */}
-      {recentSongs.length > 0 && (
-        <section className="mt-14">
-          <h2 className="font-heading text-xl font-semibold text-maroon">Well-Documented Songs</h2>
-          <p className="mt-1 text-sm text-stone-500">
-            Songs with the most cross-referenced data across sources
-          </p>
-          <div className="mt-4 space-y-1">
-            {recentSongs.map((song) => (
-              <Link
-                key={song.slug}
-                href={`/songs/${song.slug}`}
-                className="flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors hover:bg-stone-50"
-              >
-                <span>
-                  <span className="font-medium">{song.title}</span>
-                  {song.filmTitle && (
-                    <span className="ml-2 text-stone-400">
-                      {song.filmTitle}
-                      {song.year ? ` (${song.year})` : ""}
-                    </span>
-                  )}
-                </span>
-                {song.composerName && (
-                  <span className="text-xs text-stone-400">
-                    {song.composerName}
-                  </span>
-                )}
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
     </div>
   );
 }
