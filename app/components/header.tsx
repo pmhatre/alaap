@@ -23,6 +23,9 @@ export function Header() {
           <Link href="/charts" className="hover:text-maroon">
             Charts
           </Link>
+          <Link href="/favorites" className="hover:text-maroon">
+            Favorites
+          </Link>
         </nav>
       </div>
     </header>
