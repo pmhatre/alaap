@@ -4,7 +4,7 @@
 A knowledge base and exploratory interface for golden era Indian film music (late 1940s-1970s), with emphasis on classical and semi-classical compositions. Built as a personal project by Praneet Mhatre.
 
 ## Project Status
-Phase 0 (scaffolding), Phase 1A (data seeding), Phase 1B (core pages), quick wins, Phase 2A (ragaDB enrichment), and F8 (Favorites) complete. Post-dedup, Neo4j has ~14.5K songs, ~4.5K artists, ~4.4K films, 274 ragas (75 enriched with musicological properties), 10 thaats, 37 taals from 5 sources. Songs and films have language tags; Wikipedia scraper includes non-Hindi songs (~230 non-Hindi). Raga detail pages now show aroha, avaroha, vadi, samvadi, pakad, timeOfDay, and thaat for enriched ragas. Favorites page at `/favorites` with 5 curated songs and personal annotations.
+Phase 0 (scaffolding), Phase 1A (data seeding), Phase 1B (core pages), quick wins, Phase 2A (ragaDB enrichment), F8 (Favorites + About), and homepage/listing refinements complete. Post-dedup, Neo4j has ~14.5K songs, ~4.5K artists, ~4.4K films, 274 ragas (75 enriched with musicological properties), 10 thaats, 37 taals from 5 sources. Songs and films have language tags; Wikipedia scraper includes non-Hindi songs (~230 non-Hindi). Raga detail pages show aroha, avaroha, vadi, samvadi, pakad, timeOfDay, and thaat for enriched ragas. Favorites page at `/favorites` with 6 curated songs + personal annotations. About page at `/about`. Artist listing shows role badges. Raga song listings default to Hindi language filter.
 
 ## Key Documentation
 - `docs/vision.md` — project vision, thesis, design principles
@@ -17,12 +17,13 @@ Phase 0 (scaffolding), Phase 1A (data seeding), Phase 1B (core pages), quick win
 ## Project Structure
 - `app/` — Next.js 15 App Router
   - `components/` — shared UI: `header`, `song-card`, `pagination`, `entity-link`, `empty-state`, `youtube-embed`
-  - `data/` — curated flat files: `favorites.json` (song slugs, annotations, listenFor notes)
+  - `data/` — curated flat files: `favorites.json` (song slugs, displayTitle overrides, annotations, listenFor notes)
   - `songs/[slug]/` — song detail page + lyrics toggle
-  - `ragas/` — raga listing + `[slug]/` detail page
-  - `artists/` — artist listing + `[slug]/` profile with role tabs
+  - `ragas/` — raga listing + `[slug]/` detail page (Hindi language default)
+  - `artists/` — artist listing with role badges + `[slug]/` profile with role tabs
   - `films/` — paginated films listing + `[slug]/` detail page
-  - `favorites/` — Praneet's Favorites personal canon page
+  - `favorites/` — My Favorites personal canon page (6 songs, YouTube embeds, annotations)
+  - `about/` — About Alaap page (serious hobbyist framing, project origin)
   - `search/` — search with filters, autocomplete (`search-input.tsx`), and sort options
   - `api/search/suggest/` — autocomplete API route (song title suggestions with relevance tiering)
 - `lib/` — shared modules
