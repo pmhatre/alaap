@@ -56,59 +56,52 @@ export default async function FavoritesPage() {
 
       {/* Song entries */}
       <div className="mt-10 space-y-14">
-        {songs.map((entry, i) => {
+        {songs.map((entry) => {
           const title = entry.displayTitle || entry.song.title;
           return (
             <article key={entry.song.slug}>
-              {/* Header: rank + title */}
-              <div className="flex items-start gap-4">
-                <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-maroon/10 font-heading text-sm font-bold text-maroon">
-                  {i + 1}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <h2 className="font-heading text-xl font-semibold">
-                    <a
-                      href={`/songs/${entry.song.slug}`}
-                      className="text-stone-900 hover:text-maroon"
-                    >
-                      {title}
-                    </a>
-                  </h2>
+              {/* Header: title */}
+              <h2 className="font-heading text-xl font-semibold">
+                <a
+                  href={`/songs/${entry.song.slug}`}
+                  className="text-stone-900 hover:text-maroon"
+                >
+                  {title}
+                </a>
+              </h2>
 
-                  {/* Metadata: film, year, singers, composer, raga */}
-                  <div className="mt-2 flex flex-wrap items-center gap-2">
-                    {entry.song.film && (
-                      <EntityLink
-                        type="film"
-                        slug={entry.song.film.slug}
-                        name={`${entry.song.film.title}${entry.song.year ? ` (${entry.song.year})` : ""}`}
-                      />
-                    )}
-                    {entry.song.singers.map((s) => (
-                      <EntityLink
-                        key={s.slug}
-                        type="artist"
-                        slug={s.slug}
-                        name={s.name}
-                      />
-                    ))}
-                    {entry.song.composer && (
-                      <EntityLink
-                        type="artist"
-                        slug={entry.song.composer.slug}
-                        name={entry.song.composer.name}
-                      />
-                    )}
-                    {entry.song.ragas.map((r) => (
-                      <EntityLink
-                        key={r.slug}
-                        type="raga"
-                        slug={r.slug}
-                        name={r.name}
-                      />
-                    ))}
-                  </div>
-                </div>
+              {/* Metadata: film, year, singers, composer, raga */}
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                {entry.song.film && (
+                  <EntityLink
+                    type="film"
+                    slug={entry.song.film.slug}
+                    name={`${entry.song.film.title}${entry.song.year ? ` (${entry.song.year})` : ""}`}
+                  />
+                )}
+                {entry.song.singers.map((s) => (
+                  <EntityLink
+                    key={s.slug}
+                    type="artist"
+                    slug={s.slug}
+                    name={s.name}
+                  />
+                ))}
+                {entry.song.composer && (
+                  <EntityLink
+                    type="artist"
+                    slug={entry.song.composer.slug}
+                    name={entry.song.composer.name}
+                  />
+                )}
+                {entry.song.ragas.map((r) => (
+                  <EntityLink
+                    key={r.slug}
+                    type="raga"
+                    slug={r.slug}
+                    name={r.name}
+                  />
+                ))}
               </div>
 
               {/* YouTube embed */}
