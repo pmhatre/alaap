@@ -3,6 +3,7 @@ import favoritesData from "@/app/data/favorites.json";
 
 export interface FavoriteSong {
   song: SongDetail;
+  displayTitle?: string;
   annotation: string;
   listenFor?: string;
 }
@@ -19,6 +20,7 @@ export async function getFavorites(): Promise<FavoritesData> {
       if (!song) return null;
       return {
         song,
+        displayTitle: ("displayTitle" in entry ? entry.displayTitle : undefined) as string | undefined,
         annotation: entry.annotation,
         listenFor: entry.listenFor || undefined,
       } satisfies FavoriteSong;

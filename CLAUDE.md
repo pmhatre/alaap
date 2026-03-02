@@ -89,3 +89,6 @@ Think like a deeply knowledgeable editor and cultural curator of golden era Hind
 - Prioritize depth and quality over breadth
 - Keep the personal voice — Praneet's favorites section is core, not optional
 - Accessible to non-classically-trained listeners while being musically rigorous
+
+## Author's Perspective
+Praneet is a serious hobbyist and music lover, not a trained musician or musicologist. The curiosity that drives Alaap comes from wanting to understand *why* certain songs have more repeat value than others — what makes them stick. That curiosity is what sends him down the path of ragas, ornamentation, and recording history. This framing matters for editorial voice: annotations should read as a curious listener sharing discoveries, not an authority lecturing. The tone is "here's what I found" rather than "here's what you should know."
