@@ -1,5 +1,6 @@
 # Data pipeline (Python, not needed for Next.js build)
-pipeline
+pipeline/*
+!pipeline/data
 scripts
 db
 
