@@ -31,23 +31,29 @@ export default async function ArtistsPage({ searchParams }: Props) {
 
   const neo4j = (await import("neo4j-driver")).default;
 
+  const roleThreshold = 3; // ignore roles with fewer songs (scraping noise)
   const [artistRows, countRows] = await Promise.all([
     read<Record<string, unknown>>(
       `MATCH (a:Artist)<-[:SUNG_BY|COMPOSED_BY|LYRICS_BY]-(s:Song)
+       WHERE a.name <> 'Songs'
        WITH a, count(DISTINCT s) AS songCount
        OPTIONAL MATCH (s1:Song)-[:SUNG_BY]->(a)
        WITH a, songCount, count(DISTINCT s1) AS sc
        OPTIONAL MATCH (s2:Song)-[:COMPOSED_BY]->(a)
        WITH a, songCount, sc, count(DISTINCT s2) AS cc
        OPTIONAL MATCH (s3:Song)-[:LYRICS_BY]->(a)
+       WITH a, songCount, sc, cc, count(DISTINCT s3) AS lc
        RETURN a.name AS name, a.slug AS slug, songCount,
-              sc > 0 AS isSinger, cc > 0 AS isComposer, count(DISTINCT s3) > 0 AS isLyricist
+              sc >= $roleThreshold AS isSinger,
+              cc >= $roleThreshold AS isComposer,
+              lc >= $roleThreshold AS isLyricist
        ORDER BY songCount DESC
        SKIP $skip LIMIT $limit`,
-      { skip: neo4j.int(skip), limit: neo4j.int(PAGE_SIZE) },
+      { skip: neo4j.int(skip), limit: neo4j.int(PAGE_SIZE), roleThreshold: neo4j.int(roleThreshold) },
     ),
     read<Record<string, unknown>>(
       `MATCH (a:Artist)<-[:SUNG_BY|COMPOSED_BY|LYRICS_BY]-(s:Song)
+       WHERE a.name <> 'Songs'
        WITH a, count(DISTINCT s) AS songCount
        WHERE songCount > 0
        RETURN count(a) AS total`,

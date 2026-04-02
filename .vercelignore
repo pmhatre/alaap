@@ -1,0 +1,20 @@
+# Data pipeline (Python, not needed for Next.js build)
+pipeline
+scripts
+db
+
+# Documentation
+docs
+
+# Dev/local data (top-level only — don't match lib/data/ or app/data/)
+/data
+.claude
+
+# Python artifacts
+__pycache__
+.venv
+*.pyc
+
+# Build artifacts
+.next
+*.tsbuildinfo
