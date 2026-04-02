@@ -16,13 +16,13 @@ Phase 0 (scaffolding), Phase 1A (data seeding), Phase 1B (core pages), quick win
 
 ## Project Structure
 - `app/` — Next.js 15 App Router
-  - `components/` — shared UI: `header`, `song-card`, `pagination`, `entity-link`, `empty-state`, `youtube-embed`
+  - `components/` — shared UI: `header`, `song-card`, `pagination`, `entity-link`, `empty-state`, `youtube-embed`, `spotify-embed`
   - `data/` — curated flat files: `favorites.json` (song slugs, displayTitle overrides, annotations, listenFor notes)
   - `songs/[slug]/` — song detail page + lyrics toggle
   - `ragas/` — raga listing + `[slug]/` detail page (Hindi language default)
   - `artists/` — artist listing with role badges + `[slug]/` profile with role tabs
   - `films/` — paginated films listing + `[slug]/` detail page
-  - `favorites/` — My Favorites personal canon page (6 songs, YouTube embeds, annotations)
+  - `favorites/` — My Favorites personal canon page (6 songs, YouTube/Spotify embeds, annotations)
   - `about/` — About Alaap page (serious hobbyist framing, project origin)
   - `search/` — search with filters, autocomplete (`search-input.tsx`), and sort options
   - `api/search/suggest/` — autocomplete API route (song title suggestions with relevance tiering)
