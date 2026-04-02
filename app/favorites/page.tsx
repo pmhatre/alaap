@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { getFavorites } from "@/lib/data/favorites";
 import { EntityLink } from "@/app/components/entity-link";
 import { YouTubeEmbed } from "@/app/components/youtube-embed";
+import { SpotifyEmbed } from "@/app/components/spotify-embed";
 
 export const metadata: Metadata = {
   title: "My Favorites — Alaap",
@@ -104,15 +105,22 @@ export default async function FavoritesPage() {
                 ))}
               </div>
 
-              {/* YouTube embed */}
-              {entry.song.youtube_id && (
+              {/* Media embed: YouTube preferred, Spotify fallback */}
+              {entry.song.youtube_id ? (
                 <div className="mt-5">
                   <YouTubeEmbed
                     youtubeId={entry.song.youtube_id}
                     title={title}
                   />
                 </div>
-              )}
+              ) : entry.spotifyId ? (
+                <div className="mt-5">
+                  <SpotifyEmbed
+                    trackId={entry.spotifyId}
+                    title={title}
+                  />
+                </div>
+              ) : null}
 
               {/* Annotation */}
               <div className="mt-5 space-y-3 text-sm leading-relaxed text-stone-600">
