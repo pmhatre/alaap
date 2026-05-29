@@ -29,3 +29,7 @@ export function toPlainObject<T>(
 }
 
 export const PAGE_SIZE = 20;
+
+export function neo4jInt(n: number) {
+  return neo4j.int(n);
+}

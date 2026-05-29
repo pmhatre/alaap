@@ -1,6 +1,6 @@
 import { read } from "../../lib/neo4j";
 import { toNumber } from "../../lib/data/utils";
-import { songDedupKey, normalizeForDedup, isTitlePrefixMatch } from "./normalize";
+import { songDedupKey, isTitlePrefixMatch } from "./normalize";
 import type { NodeRecord, MergeGroup, DedupReport } from "./types";
 
 const SOURCE_PRIORITY = ["chandrakantha", "wikipedia", "bollywood_lyrics", "carvaan"];

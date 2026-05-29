@@ -8,7 +8,7 @@
 
 import { read } from "../../lib/neo4j";
 import { normalizeThaat } from "../enrich-ragas/normalize";
-import { fetchAllArticles, type FetchResult } from "./fetch";
+import { fetchAllArticles } from "./fetch";
 import { parseInfobox } from "./parse";
 import type {
   ExistingRaga,

@@ -7,9 +7,9 @@
  * Non-destructive: skips songs that already have geetmala data.
  *
  * Usage:
- *   npx tsx --env-file=.env.local scripts/enrich-geetmala.ts              # dry-run
- *   npx tsx --env-file=.env.local scripts/enrich-geetmala.ts --execute    # apply
- *   npx tsx --env-file=.env.local scripts/enrich-geetmala.ts --local path/to/alt.csv
+ *   pnpm data:enrich:geetmala                         # dry-run
+ *   pnpm data:enrich:geetmala -- --execute            # apply
+ *   pnpm data:enrich:geetmala -- --local path/to/alt.csv
  */
 
 import { resolve } from "path";

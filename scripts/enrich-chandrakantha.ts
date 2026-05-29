@@ -9,8 +9,8 @@
  * Polite: 2-second delay between page fetches.
  *
  * Usage:
- *   npx tsx --env-file=.env.local scripts/enrich-chandrakantha.ts           # dry-run
- *   npx tsx --env-file=.env.local scripts/enrich-chandrakantha.ts --execute # apply
+ *   pnpm data:enrich:chandrakantha              # dry-run
+ *   pnpm data:enrich:chandrakantha -- --execute # apply
  */
 
 import { closeDriver } from "../lib/neo4j";

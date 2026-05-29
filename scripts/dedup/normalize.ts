@@ -69,8 +69,8 @@ export function collapseSchwa(text: string): string {
  */
 export function filmDedupKey(title: string): string {
   // Strip common Wikipedia disambiguation suffixes before normalizing
-  let cleaned = title.replace(/\s*\(film\)\s*/gi, " ");
-  let key = normalizeSpaceless(cleaned);
+  const cleaned = title.replace(/\s*\(film\)\s*/gi, " ");
+  const key = normalizeSpaceless(cleaned);
   return collapseSchwa(key);
 }
 

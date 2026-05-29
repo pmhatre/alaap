@@ -1,7 +1,7 @@
 import { read } from "@/lib/neo4j";
 import type { SongListItem } from "./songs";
 import type { Song, Raga, Artist } from "@/lib/types";
-import { toPlainObject, toNumber, PAGE_SIZE } from "./utils";
+import { neo4jInt, toPlainObject, toNumber, PAGE_SIZE } from "./utils";
 
 export type SortOption = "year_desc" | "year_asc" | "title_asc" | "relevance";
 
@@ -272,9 +272,4 @@ export async function getSuggestions(
     year: toNumber(r.year),
     filmTitle: r.filmTitle as string | undefined,
   }));
-}
-
-function neo4jInt(n: number) {
-  const neo4j = require("neo4j-driver").default;
-  return neo4j.int(n);
 }

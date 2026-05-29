@@ -10,7 +10,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint",
+    "data:dedup": "tsx --env-file=.env.local scripts/dedup.ts",
+    "data:enrich:ragas": "tsx --env-file=.env.local scripts/enrich-ragas.ts",
+    "data:enrich:chandrakantha": "tsx --env-file=.env.local scripts/enrich-chandrakantha.ts",
+    "data:enrich:wikipedia": "tsx --env-file=.env.local scripts/enrich-wikipedia.ts",
+    "data:enrich:geetmala": "tsx --env-file=.env.local scripts/enrich-geetmala.ts"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.4",
@@ -22,6 +27,7 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.3.5",
     "@tailwindcss/postcss": "^4.0.0",
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
@@ -30,6 +36,7 @@
     "eslint": "^9.0.0",
     "eslint-config-next": "^15.1.0",
     "tailwindcss": "^4.0.0",
+    "tsx": "^4.20.5",
     "typescript": "^5.7.0"
   }
 }

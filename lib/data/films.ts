@@ -1,6 +1,6 @@
 import { read } from "@/lib/neo4j";
 import type { Film } from "@/lib/types";
-import { toPlainObject, toNumber, PAGE_SIZE } from "./utils";
+import { neo4jInt, toPlainObject, toNumber, PAGE_SIZE } from "./utils";
 import { type SongListItem } from "./songs";
 
 export interface FilmWithCount extends Film {
@@ -47,9 +47,4 @@ export async function getFilmSongs(filmSlug: string): Promise<SongListItem[]> {
   // Re-use getSongsByFilm from songs.ts
   const { getSongsByFilm } = await import("./songs");
   return getSongsByFilm(filmSlug);
-}
-
-function neo4jInt(n: number) {
-  const neo4j = require("neo4j-driver").default;
-  return neo4j.int(n);
 }
