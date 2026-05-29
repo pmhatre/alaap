@@ -5,11 +5,11 @@
  * variants in canonical ID normalization.
  *
  * Usage:
- *   npx tsx --env-file=.env.local scripts/dedup.ts                # dry-run (default)
- *   npx tsx --env-file=.env.local scripts/dedup.ts --execute       # apply merges
- *   npx tsx --env-file=.env.local scripts/dedup.ts --films-only    # films only
- *   npx tsx --env-file=.env.local scripts/dedup.ts --artists-only  # artists only
- *   npx tsx --env-file=.env.local scripts/dedup.ts --songs-only    # songs only
+ *   pnpm data:dedup                   # dry-run (default)
+ *   pnpm data:dedup -- --execute      # apply merges
+ *   pnpm data:dedup -- --films-only   # films only
+ *   pnpm data:dedup -- --artists-only # artists only
+ *   pnpm data:dedup -- --songs-only   # songs only
  */
 
 import { closeDriver } from "../lib/neo4j";

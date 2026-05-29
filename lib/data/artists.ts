@@ -1,6 +1,6 @@
 import { read } from "@/lib/neo4j";
 import type { Artist, Raga } from "@/lib/types";
-import { toPlainObject, toNumber } from "./utils";
+import { neo4jInt, toPlainObject, toNumber } from "./utils";
 
 export interface ArtistRole {
   role: "singer" | "composer" | "lyricist";
@@ -87,9 +87,4 @@ export async function getArtistCollaborators(
     slug: r.slug as string,
     sharedSongs: toNumber(r.sharedSongs) ?? 0,
   }));
-}
-
-function neo4jInt(n: number) {
-  const neo4j = require("neo4j-driver").default;
-  return neo4j.int(n);
 }

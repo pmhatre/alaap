@@ -8,9 +8,9 @@
  * Non-destructive: only sets null properties, never overwrites existing data.
  *
  * Usage:
- *   npx tsx --env-file=.env.local scripts/enrich-ragas.ts              # dry-run
- *   npx tsx --env-file=.env.local scripts/enrich-ragas.ts --execute    # apply
- *   npx tsx --env-file=.env.local scripts/enrich-ragas.ts --local ragas.json
+ *   pnpm data:enrich:ragas                    # dry-run
+ *   pnpm data:enrich:ragas -- --execute       # apply
+ *   pnpm data:enrich:ragas -- --local ragas.json
  */
 
 import { closeDriver } from "../lib/neo4j";

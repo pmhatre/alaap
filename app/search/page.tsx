@@ -4,6 +4,7 @@ import { searchSongs, getFilterOptions, type SortOption } from "@/lib/data/searc
 import { SongCard } from "@/app/components/song-card";
 import { Pagination } from "@/app/components/pagination";
 import { EmptyState } from "@/app/components/empty-state";
+import { EntityLegend } from "@/app/components/entity-legend";
 import { SearchFilters } from "./search-filters";
 
 export const metadata: Metadata = {
@@ -63,6 +64,7 @@ export default async function SearchPage({ searchParams }: Props) {
       <p className="mt-2 text-sm text-stone-500">
         {total.toLocaleString()} songs
       </p>
+      <EntityLegend className="mt-3" />
 
       <div className="mt-6">
         <Suspense fallback={null}>

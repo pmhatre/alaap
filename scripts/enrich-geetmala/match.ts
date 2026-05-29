@@ -3,6 +3,7 @@
  * Reuses normalization functions from the dedup module.
  */
 
+import neo4j from "neo4j-driver";
 import { read } from "../../lib/neo4j";
 import {
   songDedupKey,
@@ -33,7 +34,6 @@ async function fetchExistingSongs(): Promise<ExistingSong[]> {
             s.geetmala_year AS geetmala_year`,
   );
 
-  const neo4j = require("neo4j-driver").default;
   return rows.map((r) => ({
     slug: r.slug as string,
     title: r.title as string,

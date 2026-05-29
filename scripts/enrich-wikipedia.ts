@@ -9,8 +9,8 @@
  * Polite: 1-second delay between API calls.
  *
  * Usage:
- *   npx tsx --env-file=.env.local scripts/enrich-wikipedia.ts           # dry-run
- *   npx tsx --env-file=.env.local scripts/enrich-wikipedia.ts --execute # apply
+ *   pnpm data:enrich:wikipedia              # dry-run
+ *   pnpm data:enrich:wikipedia -- --execute # apply
  */
 
 import { closeDriver } from "../lib/neo4j";

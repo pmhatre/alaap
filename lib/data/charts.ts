@@ -1,7 +1,7 @@
 import { readFileSync } from "fs";
 import { resolve } from "path";
 import { read } from "@/lib/neo4j";
-import { toNumber } from "./utils";
+import { neo4jInt, toNumber } from "./utils";
 
 export interface ChartEntry {
   rank: number;
@@ -46,11 +46,6 @@ function parseCSV(): CSVEntry[] {
     entries.push({ year, rank, title: fields[2], film: fields[3], singers: fields[4] });
   }
   return entries;
-}
-
-function neo4jInt(n: number) {
-  const neo4j = require("neo4j-driver").default;
-  return neo4j.int(n);
 }
 
 /** Neo4j match data for a charted song */

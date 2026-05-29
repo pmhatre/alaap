@@ -1,6 +1,6 @@
 import { read } from "@/lib/neo4j";
 import type { Raga } from "@/lib/types";
-import { toPlainObject, toNumber, PAGE_SIZE } from "./utils";
+import { neo4jInt, toPlainObject, toNumber, PAGE_SIZE } from "./utils";
 
 export interface RagaWithCount extends Raga {
   songCount: number;
@@ -88,9 +88,4 @@ export async function getRagaSongCount(ragaSlug: string): Promise<number> {
     { ragaSlug },
   );
   return toNumber(rows[0]?.total) ?? 0;
-}
-
-function neo4jInt(n: number) {
-  const neo4j = require("neo4j-driver").default;
-  return neo4j.int(n);
 }

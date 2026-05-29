@@ -32,13 +32,14 @@ export function SongCard({ song }: SongCardProps) {
           )}
           <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-stone-500">
             {song.filmTitle && song.filmSlug && (
-              <Link
-                href={`/films/${song.filmSlug}`}
-                className="hover:text-stone-700"
-              >
-                {song.filmTitle}
-                {song.year ? ` (${song.year})` : ""}
-              </Link>
+              <span className="inline-flex items-center gap-1.5">
+                <EntityLink
+                  type="film"
+                  slug={song.filmSlug}
+                  name={song.filmTitle}
+                />
+                {song.year && <span>{song.year}</span>}
+              </span>
             )}
             {!song.filmTitle && song.year && <span>{song.year}</span>}
             {song.singers.length > 0 && (

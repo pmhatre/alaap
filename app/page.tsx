@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { EntityLegend } from "@/app/components/entity-legend";
 import {
   getHomeStats,
   getFeaturedRagas,
@@ -44,6 +45,7 @@ export default async function Home() {
         <StatDivider />
         <StatItem label="Taals" value={stats.taals} />
       </div>
+      <EntityLegend className="mt-5 justify-center" />
 
       {/* Browse cards */}
       <div className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">

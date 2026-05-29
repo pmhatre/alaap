@@ -11,6 +11,7 @@ interface SearchInputProps {
 
 export function SearchInput({ defaultValue, onSubmit }: SearchInputProps) {
   const router = useRouter();
+  const listboxId = "search-suggestions";
   const [value, setValue] = useState(defaultValue);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [activeIndex, setActiveIndex] = useState(-1);
@@ -107,6 +108,7 @@ export function SearchInput({ defaultValue, onSubmit }: SearchInputProps) {
         }}
         className="w-full rounded-lg border border-stone-200 px-4 py-2.5 text-sm placeholder:text-stone-400 focus:border-maroon focus:outline-none"
         role="combobox"
+        aria-controls={listboxId}
         aria-expanded={isOpen}
         aria-autocomplete="list"
         aria-activedescendant={
@@ -115,6 +117,7 @@ export function SearchInput({ defaultValue, onSubmit }: SearchInputProps) {
       />
       {isOpen && suggestions.length > 0 && (
         <ul
+          id={listboxId}
           role="listbox"
           className="absolute z-50 mt-1 max-h-80 w-full overflow-auto rounded-lg border border-stone-200 bg-cream py-1 shadow-lg"
         >

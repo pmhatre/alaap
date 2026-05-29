@@ -1,5 +1,5 @@
 import { read } from "@/lib/neo4j";
-import { toNumber } from "./utils";
+import { neo4jInt, toNumber } from "./utils";
 
 export interface HomeStats {
   songs: number;
@@ -92,9 +92,4 @@ export async function getRecentlyAddedSongs(
     filmSlug: r.filmSlug as string | undefined,
     composerName: r.composerName as string | undefined,
   }));
-}
-
-function neo4jInt(n: number) {
-  const neo4j = require("neo4j-driver").default;
-  return neo4j.int(n);
 }

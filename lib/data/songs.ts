@@ -1,6 +1,6 @@
 import { read } from "@/lib/neo4j";
 import type { Song, Raga, Artist, Film, Taal } from "@/lib/types";
-import { toPlainObject, toNumber, PAGE_SIZE } from "./utils";
+import { neo4jInt, toPlainObject, toNumber, PAGE_SIZE } from "./utils";
 
 export interface SongDetail extends Song {
   ragas: Raga[];
@@ -259,9 +259,4 @@ export async function getRecommendedSongs(
       seen.add(song.slug);
       return true;
     });
-}
-
-function neo4jInt(n: number) {
-  const neo4j = require("neo4j-driver").default;
-  return neo4j.int(n);
 }
