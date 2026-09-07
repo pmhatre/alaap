@@ -26,6 +26,7 @@ Phase 0 (scaffolding), Phase 1A (data seeding), Phase 1B (core pages), quick win
   - `about/` — About Alaap page (serious hobbyist framing, project origin)
   - `search/` — search with filters, autocomplete (`search-input.tsx`), and sort options
   - `api/search/suggest/` — autocomplete API route (song title suggestions with relevance tiering)
+  - `api/keepalive/` — daily Vercel cron target; one tiny write keeps Aura Free from pausing (requires `CRON_SECRET`)
 - `lib/` — shared modules
   - `neo4j.ts` — driver singleton, `read()`/`write()` helpers
   - `types.ts` — entity interfaces (Song, Raga, Artist, Film, Taal, etc.)
@@ -42,7 +43,10 @@ Phase 0 (scaffolding), Phase 1A (data seeding), Phase 1B (core pages), quick win
   - `dedup/` — modular dedup: `films.ts`, `artists.ts`, `songs.ts`, `normalize.ts` (schwa collapse, transliteration flattening), `merge.ts`, `types.ts`
   - `enrich-ragas.ts` — ragaDB enrichment orchestrator (`--execute`, `--local <path>`)
   - `enrich-ragas/` — modular enrichment: `types.ts`, `fetch.ts`, `normalize.ts` (name matching, note formatting, time/thaat normalization), `match.ts`, `apply.ts`
-- `db/` — Neo4j schema constraints and setup instructions
+  - `run-cypher.ts` — runs a `.cypher` file statement by statement (`pnpm data:cypher <file>`); used for constraints and curation
+  - `snapshot.ts` — full graph export/restore as gzipped JSONL (`pnpm data:snapshot`, `pnpm data:restore`)
+- `db/` — `constraints.cypher`, `curation.cypher` (committed manual data fixes), and `README.md` (provisioning, backup, recovery runbook)
+- `vercel.json` — daily keep-alive cron
 
 ## Technical Stack
 - **Graph DB**: Neo4j Aura Free — Cypher queries, `neo4j-driver` for TypeScript
@@ -53,6 +57,13 @@ Phase 0 (scaffolding), Phase 1A (data seeding), Phase 1B (core pages), quick win
 - **NL search (Phase 2)**: Claude Haiku (text-to-Cypher) + Claude Sonnet (response formatting)
 - **Graph viz**: react-force-graph-2d
 - **Architecture doc**: `docs/architecture.md`
+
+## Data Durability
+Aura Free pauses an instance after 72 hours without activity and deletes it after 30 days paused. The original instance was deleted on 2026-08-23 and rebuilt on 2026-09-07 from archived pipeline staging. Rules that follow from that:
+- **Keep-alive**: `vercel.json` schedules `/api/keepalive` daily (Hobby plan allows once per day). It writes a `Keepalive` node that nothing else reads. `CRON_SECRET` must exist on Vercel production.
+- **Snapshots**: after any manual data change or enrichment run, `pnpm data:snapshot -- --out ../alaap-data/snapshots/alaap-YYYY-MM-DD.jsonl.gz`, then commit and push in the private `pmhatre/alaap-data` repo (sibling directory). Never commit snapshots here: they contain the full lyrics corpus and this repo is public. `db/snapshots/` is gitignored.
+- **Restore**: `pnpm data:restore -- <file> --execute` (idempotent MERGE). Fallback rebuild from the staging archive is documented in `db/README.md`.
+- **Manual fixes go in `db/curation.cypher`** and are applied with `pnpm data:cypher db/curation.cypher`. Hand edits made only in Neo4j are lost on the next rebuild.
 
 ## Domain Context
 - **Raag** (raga) — melodic framework in Indian classical music. Central organizing concept.

@@ -34,3 +34,7 @@ __pycache__/
 .venv/
 venv/
 .vercel
+.env*
+
+# Graph snapshots (full lyrics dump; kept out of the public repo)
+db/snapshots/
