@@ -86,3 +86,25 @@ SET s.youtube_id = 'OtpN7bzQb4Q';
 // Zee Music Classic; Carvaan's dXY4P26cqDM is dead
 MATCH (s:Song {slug: 'aa-ab-laut-chalen-jis-desh-mein-gangaa-behti-hai-1960'})
 SET s.youtube_id = 'qPGVPpwgBTc';
+
+// ---------------------------------------------------------------------------
+// Thaat canonicalisation. Enrichment sources spell thaats differently
+// (Khammaj, Khamāj, Asawari) and one Wikipedia infobox leaked a whole sentence
+// in as a thaat name (Gara). Fold everything onto the ten Bhatkhande thaats.
+// (Thaat lives only on the BELONGS_TO_THAAT relationship; ragas have no thaat property.)
+// ---------------------------------------------------------------------------
+MATCH (r:Raga)-[rel:BELONGS_TO_THAAT]->(bad:Thaat)
+WHERE bad.name IN ['Khammaj', 'Khamāj'] OR bad.name STARTS WITH 'This raga is in the Khamaj'
+MATCH (good:Thaat {name: 'Khamaj'})
+MERGE (r)-[:BELONGS_TO_THAAT]->(good)
+DELETE rel;
+
+MATCH (r:Raga)-[rel:BELONGS_TO_THAAT]->(bad:Thaat {name: 'Asawari'})
+MATCH (good:Thaat {name: 'Asavari'})
+MERGE (r)-[:BELONGS_TO_THAAT]->(good)
+DELETE rel;
+
+MATCH (t:Thaat)
+WHERE NOT (t)<-[:BELONGS_TO_THAAT]-()
+  AND NOT t.name IN ['Bilawal', 'Kalyan', 'Khamaj', 'Bhairav', 'Purvi', 'Marwa', 'Kafi', 'Asavari', 'Bhairavi', 'Todi']
+DETACH DELETE t;
