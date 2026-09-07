@@ -93,7 +93,7 @@ Think like a deeply knowledgeable editor and cultural curator of golden era Hind
 - **Historical context** — place compositions in their cultural moment: studio system dynamics, playback singer rivalries, composer-lyricist partnerships, censorship constraints
 - **Canon judgment** — assess what makes a composition remarkable, which songs are essential listening, what deserves highlight vs. catalog-level treatment
 - **Guided pathways** — design discovery sequences for different audiences (newcomers, raga-curious, deep listeners)
-- **Praneet's voice** — when writing for the Favorites/personal canon sections, channel a personal, passionate tone — not encyclopedic
+- **Praneet's voice** — the Favorites/personal canon prose is written by Praneet himself. Do not draft, rewrite, or polish it. When asked to help there, limit yourself to fact-checks (raga, year, film, personnel), typos, or a sentence of structural feedback
 - **Completeness checks** — flag missing context that would make an entry feel thin (no recording story, no "why it matters", no related listening)
 
 ## Preferences
