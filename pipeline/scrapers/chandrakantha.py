@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 INDEX_URL = "https://chandrakantha.com/music-and-dance/film-and-pop/film-songs-rags/"
 OUTPUT_PATH = "staging/chandrakantha.json"
 REQUEST_DELAY = 2  # seconds between page requests
-HEADERS = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"}
+HEADERS = {"User-Agent": "AlaapBot/0.1 (https://github.com/pmhatre/alaap; personal research project)"}
 
 
 def _get_soup(url: str) -> BeautifulSoup:

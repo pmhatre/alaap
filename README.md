@@ -21,3 +21,13 @@ Alaap makes this music accessible, discoverable, and understandable — connecti
 ## Status
 
 Early development. See [docs/](docs/) for vision, research, and roadmap.
+
+## License
+
+The code in this repository is MIT licensed — see [LICENSE](LICENSE).
+
+The license covers the code only. The song, raga, and chart data comes from
+third-party sources, each with its own terms, and the underlying musical works
+and lyrics remain the property of their respective rights holders. See
+[docs/SOURCES.md](docs/SOURCES.md) for full attribution of every source and how
+its data is used.

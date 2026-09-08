@@ -11,7 +11,7 @@
  */
 
 const API_BASE = "https://en.wikipedia.org/w/api.php";
-const USER_AGENT = "Alaap/1.0 (https://github.com/praneetmhatre/alaap; raga enrichment)";
+const USER_AGENT = "Alaap/1.0 (https://github.com/pmhatre/alaap; raga enrichment)";
 const DELAY_MS = 1000;
 
 function sleep(ms: number): Promise<void> {

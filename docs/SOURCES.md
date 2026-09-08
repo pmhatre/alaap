@@ -14,7 +14,7 @@ These sources have been scraped, processed, and loaded into the Neo4j knowledge 
 - **What we get**: Song title, film, year, raga, taal, composer, singer(s), lyricist, notes
 - **Why it matters**: The only source with taal (rhythmic cycle) data. Authoritative raga identifications curated by a practitioner.
 - **Coverage**: ~80 ragas, ~1,000+ songs
-- **How used**: HTML scraper (`pipeline/scrapers/chandrakantha.py`)
+- **How used**: HTML scraper (`pipeline/scrapers/chandrakantha.py`) with `AlaapBot/0.1` User-Agent and a 2s delay between pages
 - **Source priority**: Highest — trusted for raga and taal assignments over other sources
 
 ### 2. Wikipedia: List of Film Songs Based on Ragas

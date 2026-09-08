@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 WIKI_URL = "https://en.wikipedia.org/wiki/List_of_film_songs_based_on_ragas"
 OUTPUT_PATH = "staging/wikipedia.json"
-HEADERS = {"User-Agent": "AlaapBot/0.1 (https://github.com/praneetmhatre/alaap; personal research project)"}
+HEADERS = {"User-Agent": "AlaapBot/0.1 (https://github.com/pmhatre/alaap; personal research project)"}
 
 # Map header text (lowercased, cleaned) to our field names
 HEADER_MAP = {
