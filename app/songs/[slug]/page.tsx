@@ -140,7 +140,7 @@ export default async function SongPage({ params }: Props) {
       <RecommendedSongs songs={recommendedSongs} />
 
       {/* Lyrics */}
-      {song.lyrics && <LyricsSection lyrics={song.lyrics} />}
+      {song.lyrics && <LyricsSection lyrics={song.lyrics} sources={song.sources} />}
     </div>
   );
 }
