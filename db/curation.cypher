@@ -210,3 +210,14 @@ DETACH DELETE a;
 MATCH (a:Artist {slug: 'chorus'})
 WHERE a.name <> 'Chorus'
 SET a.name = 'Chorus';
+
+// Composer name variants (the split script only touches singers).
+UNWIND ['Chitragupt (Composer)', 'Chitragupta'] AS variantName
+MATCH (v:Artist {name: variantName})<-[r]-(s:Song)
+MATCH (c:Artist {slug: 'chitragupt'})
+MERGE (s)-[:$(type(r))]->(c)
+DELETE r;
+
+MATCH (v:Artist)
+WHERE v.name IN ['Chitragupt (Composer)', 'Chitragupta'] AND NOT (v)<--()
+DETACH DELETE v;

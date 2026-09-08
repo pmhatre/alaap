@@ -32,7 +32,7 @@ const MAX_SPAN = 4;
 const BATCH_SIZE = 50;
 const IGNORE = new Set([
   "chorus", "others", "group", "and", "amp", "with", "feat", "ft",
-  "various", "female", "male", "voice", "unknown", "traditional", "singer", "singers",
+  "various", "female", "male", "voice", "other", "unknown", "traditional", "singer", "singers", "pathos",
 ]);
 
 /**
@@ -127,12 +127,17 @@ const ALIASES: Record<string, Target> = {
 
 type ArtistRow = { slug: string; name: string; rels: number; sung: number };
 type Part = { kind: "singer"; target: Target } | { kind: "drop"; token: string };
-type Plan = { artist: ArtistRow; parts: Target[]; via: "alias" | "split" };
+type Plan = { artist: ArtistRow; parts: Target[]; via: "alias" | "split" | "filler" };
+
+/** Name without parenthetical labels such as "(Musician)" or "(Female Version)". */
+function stripParens(name: string): string {
+  return name.replace(/\(.*?\)/g, " ").replace(/\s+/g, " ").trim();
+}
 
 function tokens(name: string): string[] {
-  return name
+  return stripParens(name)
     .toLowerCase()
-    .replace(/[.\-–—_/]/g, " ")
+    .replace(/[.\-–—_/|]/g, " ")
     .replace(/[^a-z0-9 ]/g, "")
     .split(/\s+/)
     .filter(Boolean);
@@ -217,6 +222,23 @@ function buildDictionary(artists: ArtistRow[]): { dict: Map<string, Target>; rem
 function plan(artists: ArtistRow[], dict: Map<string, Target>) {
   const plans: Plan[] = [];
   const unresolved: ArtistRow[] = [];
+  const byKey = new Map<string, ArtistRow[]>();
+  for (const a of artists) {
+    const k = keyOf(a.name);
+    if (k) byKey.set(k, [...(byKey.get(k) ?? []), a]);
+  }
+  /**
+   * Canonical node among those sharing a normalized name: prefer a name without a
+   * parenthetical label, then the most relationships. Returns undefined when `self`
+   * is already canonical, so merges only ever flow toward the canonical node.
+   */
+  const existing = (k: string, self: ArtistRow): Target | undefined => {
+    const group = byKey.get(k) ?? [];
+    if (group.length < 2) return undefined;
+    const clean = (x: ArtistRow) => (stripParens(x.name) === x.name.trim() ? 1 : 0);
+    const canonical = [...group].sort((x, y) => clean(y) - clean(x) || y.rels - x.rels)[0];
+    return canonical.slug === self.slug ? undefined : { slug: canonical.slug, name: canonical.name };
+  };
   for (const a of artists) {
     if (a.sung < 1) continue;
     const toks = tokens(a.name);
@@ -224,14 +246,18 @@ function plan(artists: ArtistRow[], dict: Map<string, Target>) {
     if (!k) continue;
 
     if (PROTECTED.has(k)) continue;
-    const alias = ALIASES[k];
-    if (alias && alias.slug !== a.slug) {
-      plans.push({ artist: a, parts: [alias], via: "alias" });
+
+    // Variant of a known name: alias table, dictionary, another node with the same
+    // normalized name, or a parenthetical label on an otherwise new name.
+    const dictHit = dict.get(k);
+    const variant: Target | undefined =
+      ALIASES[k] ?? (dictHit && dictHit.slug !== a.slug ? dictHit : undefined) ?? existing(k, a);
+    if (variant && variant.slug !== a.slug) {
+      plans.push({ artist: a, parts: [variant], via: "alias" });
       continue;
     }
-    if (toks.length < 2) continue;
 
-    const seg = segment(toks, dict, k, a.slug);
+    const seg = toks.length >= 2 ? segment(toks, dict, k, a.slug) : null;
     if (seg) {
       const singers = seg.filter((p): p is Extract<Part, { kind: "singer" }> => p.kind === "singer");
       const drops = seg.length - singers.length;
@@ -241,8 +267,31 @@ function plan(artists: ArtistRow[], dict: Map<string, Target>) {
         continue;
       }
     }
+    // Filler-only fix: "Sardul Sikandar Chorus" -> "Sardul Sikandar", even when the
+    // remaining singer is unknown (created if absent). Strictly more accurate than leaving it.
+    const kept = toks.filter((t) => !IGNORE.has(t));
+    if (kept.length >= 1 && kept.length <= 4 && kept.length < toks.length) {
+      const remKey = kept.join(" ");
+      const target: Target = ALIASES[remKey] ?? dict.get(remKey) ?? existing(remKey, a) ?? {
+        slug: kept.join("-"),
+        name: stripParens(a.name)
+          .split(/\s+/)
+          .filter((w) => !IGNORE.has(w.toLowerCase().replace(/[^a-z0-9]/g, "")))
+          .join(" ")
+          .trim(),
+      };
+      if (target.slug !== a.slug && target.name) {
+        plans.push({ artist: a, parts: [target], via: "filler" });
+        continue;
+      }
+    }
+    // Parenthetical label on an otherwise unknown name: "Hamida Banu (Singer)" -> "Hamida Banu".
+    if (stripParens(a.name) !== a.name.trim() && toks.length >= 1 && toks.join("-") !== a.slug) {
+      plans.push({ artist: a, parts: [{ slug: toks.join("-"), name: stripParens(a.name) }], via: "filler" });
+      continue;
+    }
     // Likely compound we could not fully resolve: contains a known singer or alias span.
-    if (a.sung >= 2 && !dict.has(k) && ALIASES[k]?.slug !== a.slug) {
+    if (toks.length >= 2 && a.sung >= 2 && !dict.has(k) && ALIASES[k]?.slug !== a.slug) {
       const hasKnown = toks.some((t) => ALIASES[t] || dict.has(t)) ||
         toks.some((_, i) => toks.slice(i, i + 2).length === 2 && (ALIASES[toks.slice(i, i + 2).join(" ")] || dict.has(toks.slice(i, i + 2).join(" "))));
       if (hasKnown) unresolved.push(a);
@@ -287,7 +336,7 @@ async function execute(plans: Plan[]) {
 }
 
 function fmt(p: Plan) {
-  return `${p.artist.rels.toString().padStart(4)}  ${p.artist.name}  ->  ${p.parts.map((t) => t.name).join(" + ")}${p.via === "alias" ? "  (alias)" : ""}`;
+  return `${p.artist.rels.toString().padStart(4)}  ${p.artist.name}  ->  ${p.parts.map((t) => t.name).join(" + ")}${p.via === "alias" ? "  (alias)" : p.via === "filler" ? "  (filler)" : ""}`;
 }
 
 async function main() {
@@ -310,13 +359,18 @@ async function main() {
 
   const splits = plans.filter((p) => p.via === "split");
   const aliasOnly = plans.filter((p) => p.via === "alias");
+  const filler = plans.filter((p) => p.via === "filler");
   const links = plans.reduce((n, p) => n + p.artist.rels, 0);
-  console.log(`\nTo change: ${plans.length} nodes (${splits.length} splits, ${aliasOnly.length} alias variants), ${links} relationships re-pointed`);
+  console.log(`\nTo change: ${plans.length} nodes (${splits.length} splits, ${aliasOnly.length} alias variants, ${filler.length} filler-stripped), ${links} relationships re-pointed`);
   console.log(`\nTop splits:`);
   for (const p of splits.sort((a, b) => b.artist.rels - a.artist.rels).slice(0, 30)) console.log("  " + fmt(p));
   if (aliasOnly.length) {
-    console.log(`\nAlias variants:`);
+    console.log(`\nAlias / variant merges:`);
     for (const p of aliasOnly.sort((a, b) => b.artist.rels - a.artist.rels).slice(0, 15)) console.log("  " + fmt(p));
+  }
+  if (filler.length) {
+    console.log(`\nFiller stripped (unknown singer kept, created if absent):`);
+    for (const p of filler.sort((a, b) => b.artist.rels - a.artist.rels).slice(0, 40)) console.log("  " + fmt(p));
   }
   console.log(`\nUnresolved (look like compounds, not fully matched): ${unresolved.length}`);
   for (const a of unresolved.sort((a, b) => b.rels - a.rels).slice(0, 25)) console.log(`  ${a.rels.toString().padStart(4)}  ${a.name}`);
@@ -326,9 +380,20 @@ async function main() {
   } else if (plans.length === 0) {
     console.log(`\nNothing to do.`);
   } else {
-    console.log(`\nApplying...`);
-    const t = await execute(plans);
-    console.log(`Done: ${t.deleted} compound nodes deleted, ${t.moved} relationships re-pointed, ${t.created} singer nodes created`);
+    // Splitting can push a singer over MIN_SONGS and unlock further splits, so
+    // iterate until a pass finds nothing (bounded).
+    let current = plans;
+    const total = { deleted: 0, moved: 0, created: 0 };
+    for (let pass = 1; pass <= 6 && current.length > 0; pass++) {
+      console.log(`\nPass ${pass}: ${current.length} nodes...`);
+      const t = await execute(current);
+      total.deleted += t.deleted;
+      total.moved += t.moved;
+      total.created += t.created;
+      const again = await loadArtists();
+      current = plan(again, buildDictionary(again).dict).plans;
+    }
+    console.log(`Done: ${total.deleted} compound nodes deleted, ${total.moved} relationships re-pointed, ${total.created} singer nodes created${current.length ? `; ${current.length} still pending (re-run)` : ""}`);
   }
   await closeDriver();
 }
