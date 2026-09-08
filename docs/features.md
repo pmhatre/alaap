@@ -222,9 +222,11 @@ This knowledge feeds the `/curator` persona and enriches song annotations with h
 
 Binaca Geetmala charts page at `/charts?year=YYYY`. 1,197 entries: full ranked charts (1953-1993) + #1 toppers (1994-2000). CSV source of truth with Neo4j enrichment for linked songs. Top 10 shown per year. Geetmala badges on song cards and detail pages. 486 songs matched to Neo4j.
 
-#### F11b. Geetmala Aggregate Visualizations
+#### F11b. Geetmala Aggregate Visualizations (future — design decisions first)
 
-- ~~**Most charted singers**~~ ✓ Shipped — `/charts/singers`, overall top 15 plus top 8 per decade, 1950s through 1990s. A duet counts for both singers, so a bar shows the share of the period's charted songs a singer appears on. Kishore Kumar takes 50% of the 1970s; Rafi peaks at 43% in the 1960s and leads that decade; Lata leads all years with 396 appearances and 20 toppers.
+> A first cut of the singers view was built and reverted on 2026-09-07. It worked and the underlying findings are real, but a bar-per-singer leaderboard carrying a count, a share percentage and a topper tally read as an analytics dashboard — away from the simple, content-forward feel of the year charts, where the only number is the rank and everything else is song, film, singer. Settle the presentation before rebuilding: how many numbers a row should carry (probably one), whether proportion is shown at all, and how an aggregate view stays about the music rather than the statistics. The findings for reference: Kishore Kumar appears on 50% of 1970s charted songs, Rafi peaks at 43% in the 1960s and leads that decade over Lata, and Lata leads all years with 396 appearances and 20 toppers.
+
+- **Most charted singers** — who dominated the Geetmala across decades (Lata, Rafi, Kishore, Kumar Sanu eras)
 - **Most charted composers** — Shankar-Jaikishan vs Laxmikant-Pyarelal vs Nadeem-Shravan dominance by era
 - **Raga × popularity** — which ragas produced the most Geetmala hits? Do classical ragas chart differently than light compositions?
 - **Era analysis** — songs per film, composer concentration, singer diversity over time

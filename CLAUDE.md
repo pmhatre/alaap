@@ -22,7 +22,7 @@ Phase 0 (scaffolding), Phase 1A (data seeding), Phase 1B (core pages), quick win
   - `ragas/` — raga listing + `[slug]/` detail page (Hindi language default)
   - `artists/` — artist listing with role badges + `[slug]/` profile with role tabs
   - `films/` — paginated films listing + `[slug]/` detail page
-  - `charts/` — Binaca Geetmala year charts (`?year=YYYY`) + `singers/` most-charted singers by decade
+  - `charts/` — Binaca Geetmala annual countdown charts (`?year=YYYY`), top 10 per year
   - `favorites/` — My Favorites personal canon page (6 songs, YouTube/Spotify embeds, annotations)
   - `about/` — About Alaap page (serious hobbyist framing, project origin)
   - `search/` — search with filters, autocomplete (`search-input.tsx`), and sort options
