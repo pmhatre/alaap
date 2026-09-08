@@ -18,7 +18,8 @@
     "data:enrich:geetmala": "tsx --env-file=.env.local scripts/enrich-geetmala.ts",
     "data:cypher": "tsx --env-file=.env.local scripts/run-cypher.ts",
     "data:snapshot": "tsx --env-file=.env.local scripts/snapshot.ts export",
-    "data:restore": "tsx --env-file=.env.local scripts/snapshot.ts restore"
+    "data:restore": "tsx --env-file=.env.local scripts/snapshot.ts restore",
+    "data:split-artists": "tsx --env-file=.env.local scripts/split-compound-artists.ts"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.4",

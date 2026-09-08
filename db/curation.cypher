@@ -202,3 +202,11 @@ DELETE r;
 MATCH (s:Song {slug: 'im-falling-in-love-with-a-stranger-deewaar-1975'})
 MATCH (l:Artist {slug: 'sahir-ludhianvi'})
 MERGE (s)-[:LYRICS_BY]->(l);
+
+// Label leaks from Chandrakantha's singer column, surfaced by the compound split.
+MATCH (a:Artist {slug: 'singer-s'})
+DETACH DELETE a;
+
+MATCH (a:Artist {slug: 'chorus'})
+WHERE a.name <> 'Chorus'
+SET a.name = 'Chorus';

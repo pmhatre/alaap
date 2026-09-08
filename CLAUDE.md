@@ -45,6 +45,7 @@ Phase 0 (scaffolding), Phase 1A (data seeding), Phase 1B (core pages), quick win
   - `enrich-ragas/` — modular enrichment: `types.ts`, `fetch.ts`, `normalize.ts` (name matching, note formatting, time/thaat normalization), `match.ts`, `apply.ts`
   - `run-cypher.ts` — runs a `.cypher` file statement by statement (`pnpm data:cypher <file>`); used for constraints and curation
   - `snapshot.ts` — full graph export/restore as gzipped JSONL (`pnpm data:snapshot`, `pnpm data:restore`)
+  - `split-compound-artists.ts` — splits space-joined duet singer nodes ("Rafi Lata") into individuals via dictionary + alias table (`pnpm data:split-artists`, dry-run default). Run after dedup on every rebuild
 - `db/` — `constraints.cypher`, `curation.cypher` (committed manual data fixes), and `README.md` (provisioning, backup, recovery runbook)
 - `vercel.json` — daily keep-alive cron
 

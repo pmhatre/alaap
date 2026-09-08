@@ -46,6 +46,7 @@ from it when no snapshot exists or when the loader or dedup logic has changed:
 tar xzf ../alaap-data/staging/alaap-staging-2026-02-28.tar.gz -C pipeline/staging
 (cd pipeline && uv run python run_pipeline.py --load)
 pnpm data:dedup -- --execute
+pnpm data:split-artists -- --execute
 pnpm data:enrich:ragas -- --execute
 pnpm data:enrich:chandrakantha -- --execute
 pnpm data:enrich:wikipedia -- --execute
@@ -66,6 +67,15 @@ vercel crons run /api/keepalive
 
 Neo4j does not document whether reads count as activity, which is why the route writes.
 Also keep an eye on the Aura emails: "paused" is the warning, "deleted" is final.
+
+## Compound singer names
+
+Bollywood Lyrics joins duet singers with a space and no delimiter, so every load
+creates artists like "Kumar Sanu Alka Yagnik" or "Rafi Lata". `pnpm data:split-artists`
+finds them by matching tokens against the graph's own singer names plus a small alias
+table, re-points their songs to the individual singers, and deletes the compound node.
+Dry run by default; `-- --execute` applies. Run it after dedup on every rebuild. Names it
+cannot fully resolve are listed at the end of the report for hand curation.
 
 ## Manual data corrections
 
