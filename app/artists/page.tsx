@@ -35,7 +35,6 @@ export default async function ArtistsPage({ searchParams }: Props) {
   const [artistRows, countRows] = await Promise.all([
     read<Record<string, unknown>>(
       `MATCH (a:Artist)<-[:SUNG_BY|COMPOSED_BY|LYRICS_BY]-(s:Song)
-       WHERE a.name <> 'Songs'
        WITH a, count(DISTINCT s) AS songCount
        OPTIONAL MATCH (s1:Song)-[:SUNG_BY]->(a)
        WITH a, songCount, count(DISTINCT s1) AS sc
@@ -53,7 +52,6 @@ export default async function ArtistsPage({ searchParams }: Props) {
     ),
     read<Record<string, unknown>>(
       `MATCH (a:Artist)<-[:SUNG_BY|COMPOSED_BY|LYRICS_BY]-(s:Song)
-       WHERE a.name <> 'Songs'
        WITH a, count(DISTINCT s) AS songCount
        WHERE songCount > 0
        RETURN count(a) AS total`,

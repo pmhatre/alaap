@@ -108,3 +108,97 @@ MATCH (t:Thaat)
 WHERE NOT (t)<-[:BELONGS_TO_THAAT]-()
   AND NOT t.name IN ['Bilawal', 'Kalyan', 'Khamaj', 'Bhairav', 'Purvi', 'Marwa', 'Kafi', 'Asavari', 'Bhairavi', 'Todi']
 DETACH DELETE t;
+
+// ---------------------------------------------------------------------------
+// Artist hygiene pass (2026-09-07). Bollywood Lyrics credits several golden
+// era singers by first name only, Chandrakantha spells a few duos differently,
+// and both leak the odd placeholder in as an artist. Merge each variant into
+// its canonical node across every relationship type, then drop empty variants.
+// "Shaili Shailendra" is the lyricist's son and is deliberately NOT merged.
+// ---------------------------------------------------------------------------
+UNWIND [
+  ['kishore', 'kishore-kumar'],
+  ['talat', 'talat-mahmood'],
+  ['hemant', 'hemant-kumar'],
+  ['geeta', 'geeta-dutt'],
+  ['shamshad', 'shamshad-begum'],
+  ['laksmikant-pyarelal', 'laxmikant-pyarelal'],
+  ['kalyanji-anandj', 'kalyanji-anandji'],
+  ['sonikomi', 'sonik-omi'],
+  ['master-sonik-om-prakash-sharma', 'sonik-omi']
+] AS pair
+MATCH (v:Artist {slug: pair[0]})<-[r]-(s:Song)
+MATCH (c:Artist {slug: pair[1]})
+MERGE (s)-[:$(type(r))]->(c)
+DELETE r;
+
+MATCH (v:Artist)
+WHERE v.slug IN ['kishore', 'talat', 'hemant', 'geeta', 'shamshad', 'laksmikant-pyarelal',
+                 'kalyanji-anandj', 'sonikomi', 'master-sonik-om-prakash-sharma']
+  AND NOT (v)<--()
+DETACH DELETE v;
+
+// Shailendra Singh (singer, 1970s-80s) is a different person from Shailendra
+// (lyricist, 1949-1966). Chandrakantha credits the lyricist as "Shailendra
+// Singh", so every LYRICS_BY on the singer's node belongs to the lyricist.
+MATCH (v:Artist {slug: 'shailendra-singh'})<-[r:LYRICS_BY]-(s:Song)
+MATCH (c:Artist {slug: 'shailendra'})
+MERGE (s)-[:LYRICS_BY]->(c)
+DELETE r;
+
+MATCH (a:Artist {slug: 'shailendra-singh'})
+SET a.name = 'Shailendra Singh';
+
+// Comma-joined credits: split into the individual artists (created if absent).
+UNWIND [
+  ['shailendra-singh-prem-dhawan',        'shailendra',              'Shailendra'],
+  ['shailendra-singh-prem-dhawan',        'prem-dhawan',             'Prem Dhawan'],
+  ['prem-dhawan-sardar-jafri',            'prem-dhawan',             'Prem Dhawan'],
+  ['prem-dhawan-sardar-jafri',            'sardar-jafri',            'Sardar Jafri'],
+  ['sameer-rani-malik',                   'sameer',                  'Sameer'],
+  ['sameer-rani-malik',                   'rani-malik',              'Rani Malik'],
+  ['sayeed-qadri-hasan-kamaal',           'sayeed-quadri',           'Sayeed Quadri'],
+  ['sayeed-qadri-hasan-kamaal',           'hasan-kamaal',            'Hasan Kamaal'],
+  ['gauri-prasanna-majumdar-anand-bakshi','gauri-prasanna-majumdar', 'Gauri Prasanna Majumdar'],
+  ['gauri-prasanna-majumdar-anand-bakshi','anand-bakshi',            'Anand Bakshi'],
+  ['shrinivas-khale-anil-mohile',         'shrinivas-khale',         'Shrinivas Khale'],
+  ['shrinivas-khale-anil-mohile',         'anil-mohile',             'Anil Mohile'],
+  ['zakir-hussain-bhupen-raj',            'zakir-hussain',           'Zakir Hussain'],
+  ['zakir-hussain-bhupen-raj',            'bhupen-raj',              'Bhupen Raj']
+] AS row
+MATCH (v:Artist {slug: row[0]})<-[r]-(s:Song)
+MERGE (c:Artist {slug: row[1]}) ON CREATE SET c.name = row[2]
+MERGE (s)-[:$(type(r))]->(c);
+
+MATCH (v:Artist)
+WHERE v.slug IN ['shailendra-singh-prem-dhawan', 'prem-dhawan-sardar-jafri', 'sameer-rani-malik',
+                 'sayeed-qadri-hasan-kamaal', 'gauri-prasanna-majumdar-anand-bakshi',
+                 'shrinivas-khale-anil-mohile', 'zakir-hussain-bhupen-raj']
+DETACH DELETE v;
+
+// Placeholders and editorial notes that were loaded as artists.
+MATCH (a:Artist)
+WHERE a.slug IN ['songs', 'hindi',
+                 'it-is-claimed-that-this-is-from-amir-khusru-but-this-is-disputed',
+                 'reputed-to-be-by-ramesh-gupta-but-there-is-some-doubt',
+                 'unknown-some-suggest-that-it-was-tulsidas-some-suggest-that-it-was-17th-century-ramdas-however-it-was-modified-by-gandhi']
+DETACH DELETE a;
+
+// Wrong-role credits (verified song by song; Mukesh composing Anuraag 1956 and
+// R.D. Burman's singing credits are genuine and untouched).
+MATCH (s:Song {slug: 'khoya-khoya-chand-kala-bazar'})-[r:COMPOSED_BY]->(:Artist {slug: 'mohammed-rafi'})
+DELETE r;
+
+MATCH (s:Song {slug: 'khoya-khoya-chand-kala-bazar'})
+MATCH (c:Artist {slug: 's-d-burman'})
+MERGE (s)-[:COMPOSED_BY]->(c);
+
+MATCH (s:Song {slug: 'chale-aa-rahe-hain-wo-zulfen-bikhere-nonfilm'})-[r:COMPOSED_BY]->(:Artist {slug: 'mohammed-rafi'})
+DELETE r;
+
+MATCH (s:Song {slug: 'im-falling-in-love-with-a-stranger-deewaar-1975'})-[r:LYRICS_BY]->(:Artist {slug: 'r-d-burman'})
+DELETE r;
+
+MATCH (s:Song {slug: 'im-falling-in-love-with-a-stranger-deewaar-1975'})
+MATCH (l:Artist {slug: 'sahir-ludhianvi'})
+MERGE (s)-[:LYRICS_BY]->(l);
