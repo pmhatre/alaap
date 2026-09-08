@@ -222,9 +222,9 @@ This knowledge feeds the `/curator` persona and enriches song annotations with h
 
 Binaca Geetmala charts page at `/charts?year=YYYY`. 1,197 entries: full ranked charts (1953-1993) + #1 toppers (1994-2000). CSV source of truth with Neo4j enrichment for linked songs. Top 10 shown per year. Geetmala badges on song cards and detail pages. 486 songs matched to Neo4j.
 
-#### F11b. Geetmala Aggregate Visualizations (future)
+#### F11b. Geetmala Aggregate Visualizations
 
-- **Most charted singers** — who dominated the Geetmala across decades (Lata, Rafi, Kishore, Kumar Sanu eras)
+- ~~**Most charted singers**~~ ✓ Shipped — `/charts/singers`, overall top 15 plus top 8 per decade, 1950s through 1990s. A duet counts for both singers, so a bar shows the share of the period's charted songs a singer appears on. Kishore Kumar takes 50% of the 1970s; Rafi peaks at 43% in the 1960s and leads that decade; Lata leads all years with 396 appearances and 20 toppers.
 - **Most charted composers** — Shankar-Jaikishan vs Laxmikant-Pyarelal vs Nadeem-Shravan dominance by era
 - **Raga × popularity** — which ragas produced the most Geetmala hits? Do classical ragas chart differently than light compositions?
 - **Era analysis** — songs per film, composer concentration, singer diversity over time
