@@ -42,6 +42,14 @@ export default async function ChartsPage({ searchParams }: Props) {
       <p className="mt-2 text-sm text-stone-500">
         Top 10 most popular Hindi film songs each year, as voted by listeners.
       </p>
+      <p className="mt-3 text-sm">
+        <Link
+          href="/charts/singers"
+          className="text-maroon underline underline-offset-2 hover:text-maroon/80"
+        >
+          Most-charted singers, decade by decade
+        </Link>
+      </p>
 
       {/* Year selector */}
       <div className="mt-6 flex flex-wrap gap-2">
